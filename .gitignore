@@ -1,0 +1,15 @@
+*.egg-info
+*.pyc
+.vscode
+venv
+build
+dist
+.idea
+.tox
+runtime
+.pytest_cache
+.terraform
+*.tfstate*
+*.hcl
+outputs
+last-cli-checks

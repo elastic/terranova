@@ -1,0 +1,132 @@
+{
+  "$id": "manifest_schema_v1.1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Manifest schema version 1.2",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      },
+      "minItems": 1
+    },
+    "runbooks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/runbook"
+      },
+      "minItems": 1
+    },
+    "imports": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/import"
+      },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "contact": {
+          "type": "string"
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "target"
+      ]
+    },
+    "runbook": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "entrypoint": {
+          "type": "string"
+        },
+        "workdir": {
+          "type": "string"
+        },
+        "args": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "env": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": ["name"]
+          },
+          "minItems": 1
+        }
+      },
+      "required": [
+        "name",
+        "entrypoint"
+      ]
+    },
+    "import": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "import": {
+          "type": "string"
+        },
+        "as": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "import"
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "metadata"
+  ]
+}

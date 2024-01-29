@@ -1,0 +1,59 @@
+{
+  "$id": "manifest_schema_v1.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Manifest schema version 1.0",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "metadata": {
+      "$ref": "#/$defs/metadata"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/dependency"
+      },
+      "minItems": 1
+    }
+  },
+  "$defs": {
+    "metadata": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "contact": {
+          "type": "string"
+        }
+      }
+    },
+    "dependency": {
+      "type": "object",
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "target"
+      ]
+    }
+  },
+  "required": [
+    "version",
+    "metadata"
+  ]
+}

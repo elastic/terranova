@@ -1,0 +1,12 @@
+[general]
+# Ref: https://jorisroovers.com/gitlint/latest/configuration/
+ignore=body-is-missing
+
+[title-max-length]
+line-length=80
+
+[title-min-length]
+min-length=5
+
+[title-match-regex]
+regex=^(build|ci|docs|feat|fix|perf|refactor|test|chore)
