@@ -153,12 +153,18 @@ def init(path: str | None) -> None:
 
             # Create new symbolic links
             for dependency in manifest.dependencies:
-                os.symlink(
-                    os.path.relpath(
-                        SharedContext.shared_dir().joinpath(dependency.source).as_posix(), full_path.as_posix()
-                    ),
-                    dependency.target,
-                )
+                try:
+                    target_dirname = os.path.dirname(dependency.target)
+                    os.symlink(
+                        os.path.relpath(
+                            SharedContext.shared_dir().joinpath(dependency.source).as_posix(),
+                            full_path.joinpath(target_dirname).as_posix(),
+                        ),
+                        dependency.target,
+                    )
+                except FileExistsError:
+                    # The symlink already exists and it's probably fine
+                    pass
         finally:
             os.chdir(cwd)
 
