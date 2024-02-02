@@ -14,11 +14,11 @@ readme = "README.md"
 repository = "https://github.com/elastic/terranova"
 documentation = "https://github.com/elastic/terranova"
 classifiers = [
-    "Intended Audience :: Developers",
-    "Programming Language :: Python :: 3.11"
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3.11"
 ]
 packages = [
-    { include = "terranova" }
+  { include = "terranova" }
 ]
 
 [tool.poetry.scripts]
@@ -55,36 +55,49 @@ help = "Setup project environment."
 script = "scripts.env:configure"
 
 [tool.poe.tasks."project:upgrade"]
-deps = [ "env:configure" ]
+deps = ["env:configure"]
 help = "Upgrade project dependencies."
 cmd = "poetry up --latest"
 
+[tool.poe.tasks.wipe]
+shell = """
+import shutil
+
+for path in ["build", "dist"]:
+    try:
+        shutil.rmtree(path)
+    except FileNotFoundError as err:
+        print(f"Skipping {path} deletion...")
+"""
+interpreter = "python"
+
 [tool.poe.tasks.generate]
 deps = [
-    "env:configure"
+  "env:configure"
 ]
 help = "Generate pyinstaller config."
 script = "scripts.generate:run"
 
 [tool.poe.tasks.lint]
-deps = [ "env:configure" ]
+deps = ["env:configure"]
 help = "Lint code project."
 cmd = "pylint terranova"
 
 [tool.poe.tasks.fmt]
-deps = [ "env:configure" ]
+deps = ["env:configure"]
 help = "Format code project."
 sequence = [
-    { cmd = "isort terranova tests scripts" },
-    { cmd = "black terranova tests scripts" }
+  { cmd = "isort terranova tests scripts" },
+  { cmd = "black terranova tests scripts" }
 ]
 
 [tool.poe.tasks.build]
 deps = [
-    "env:configure"
+  "env:configure",
+  "wipe"
 ]
 help = "Build standalone binary."
-cmd = "pyinstaller terranova.spec"
+script = "scripts.build:run"
 
 [build-system]
 requires = ["poetry-core"]
