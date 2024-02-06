@@ -24,14 +24,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version-file: '.python-version'
 
-      - name: Install poetry and dependencies
-        run: |
-          pip3 install --no-cache-dir --upgrade pip poetry
-          poetry install --no-interaction
+      - name: Setup environment
+        uses: ./.github/workflows/env-setup
 
       - name: Lint
         run: poetry run poe lint
@@ -47,21 +42,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        if: matrix.os == 'ubuntu-latest'
-        uses: docker/setup-qemu-action@v3
-      - name: Set up Docker Buildx
-        if: matrix.os == 'ubuntu-latest'
-        uses: docker/setup-buildx-action@v3
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version-file: '.python-version'
-
-      - name: Install poetry and dependencies
-        run: |
-          pip3 install --no-cache-dir --upgrade pip poetry
-          poetry install --no-interaction
+      - name: Setup environment
+        uses: ./.github/workflows/env-setup
 
       - name: Build
         run: poetry run poe build
