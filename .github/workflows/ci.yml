@@ -32,6 +32,8 @@ jobs:
         run: poetry run poe lint
 
   build:
+    needs:
+      - lint
     strategy:
       matrix:
         os:
