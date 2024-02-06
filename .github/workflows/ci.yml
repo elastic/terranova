@@ -70,3 +70,13 @@ jobs:
         with:
           name: terranova-${{ matrix.os }}
           path: 'dist/*'
+
+  release:
+    runs-on: ubuntu-latest
+    needs:
+      - build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - run: ls -alh
