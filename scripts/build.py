@@ -55,6 +55,8 @@ def run() -> None:
             container_id = cmd(
                 "run",
                 "-d",
+                "--platform",
+                platform_arch,
                 "--entrypoint=cat",
                 f"{Constants.REGISTRY_URL}/terranova:{image_id}",
                 _err=sys.stderr,
