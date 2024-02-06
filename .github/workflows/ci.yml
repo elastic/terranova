@@ -75,8 +75,24 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
+    permissions:
+      contents: write
     steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/download-artifact@v4
         with:
           merge-multiple: true
-      - run: ls -alh
+
+      - name: Create the release tag
+        run: |
+          uid="$(date +%s)"
+          echo "uid=${uid}" >> "${GITHUB_ENV}"
+          git tag "untagged-${uid}"
+          git push origin "untagged-${uid}"
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create --generate-notes --latest --title="terranova ${uid}" "untagged-${uid}" ./terranova-*
