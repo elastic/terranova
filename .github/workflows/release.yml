@@ -22,7 +22,20 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
+  validate-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate tag does not exist on current commit
+        uses: ./.github/workflows/validate-tag
+        with:
+          tag: ${{ env.RELEASE_VERSION }}
+
   build:
+    needs:
+      - validate-tag
     strategy:
       matrix:
         os:
@@ -61,8 +74,22 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
+    permissions:
+      contents: write
     steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/download-artifact@v4
         with:
           merge-multiple: true
-      - run: ls -alh
+
+      - name: Create the release tag
+        run: |
+          git tag "${RELEASE_VERSION}"
+          git push origin "${RELEASE_VERSION}"
+
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create --generate-notes --latest --title="terranova v${RELEASE_VERSION}" "$RELEASE_VERSION}" ./terranova-*
