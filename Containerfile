@@ -19,5 +19,4 @@ RUN \
 # Build
 RUN \
   poetry install \
-  && poetry run pyinstaller terranova.spec \
-  && mv /opt/terranova/dist/terranova /opt/terranova/dist/terranova-${app_version}-${platform_arch}
+  && poetry run pyinstaller terranova.spec
