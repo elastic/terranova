@@ -1,6 +1,6 @@
 # Base image for build
 ARG base_image_version=3.10.12
-FROM python:${base_image_version}-bullseye as builder
+FROM python:${base_image_version}-slim-bullseye as builder
 
 # Switch workdir
 WORKDIR /opt/terranova
