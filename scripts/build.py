@@ -33,7 +33,6 @@ def run() -> None:
         cmd, env = container_backend()
         for arch in ["amd64", "arm64"]:
             platform_arch = f"linux/{arch}"
-            platform_arch_slug = platform_arch.replace("/", "-")
             cmd(
                 "buildx",
                 "build",
@@ -42,10 +41,6 @@ def run() -> None:
                 platform_arch,
                 "--build-arg",
                 f"base_image_version={python_version}",
-                "--build-arg",
-                f"platform_arch={platform_arch_slug}",
-                "--build-arg",
-                f"app_version={version}",
                 "-t",
                 f"{Constants.REGISTRY_URL}/terranova:{image_id}",
                 "-f",

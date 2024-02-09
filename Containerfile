@@ -5,12 +5,15 @@ FROM python:${base_image_version}-slim-bullseye as builder
 # Switch workdir
 WORKDIR /opt/terranova
 
-# Arguments
-ARG platform_arch
-ARG app_version
-
 # Copy files
 COPY . .
+
+# Install build packages
+RUN \
+  apt-get update > /dev/null \
+  && apt-get install -y --no-install-recommends \
+    binutils="*" \
+  && apt-get clean
 
 # Install poetry
 RUN \
