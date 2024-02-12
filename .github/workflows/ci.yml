@@ -23,15 +23,29 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version-file: '.python-version'
+      - uses: actions/checkout@v4
 
-      - name: Install poetry
-        run: |
-          curl -sSL https://install.python-poetry.org | python3 -
-          poetry install --no-interaction
+      - name: Setup environment
+        uses: ./.github/workflows/env-setup
 
       - name: Lint
         run: poetry run poe lint
+
+  build:
+    needs:
+      - lint
+    strategy:
+      matrix:
+        os:
+          - macos-14
+          - macos-13
+          - ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/workflows/env-setup
+
+      - name: Build
+        run: poetry run poe build
