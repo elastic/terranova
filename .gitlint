@@ -9,4 +9,4 @@ line-length=80
 min-length=5
 
 [title-match-regex]
-regex=^(build|ci|docs|feat|fix|perf|refactor|test|chore)
+regex=^(build|ci|docs|feat|fix|perf|refactor|test|chore|release)
