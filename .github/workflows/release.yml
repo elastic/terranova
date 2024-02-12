@@ -4,13 +4,14 @@ name: Release
 
 on:
   workflow_dispatch:
-    ref:
-      description: 'Branch or tag ref to run the workflow on'
-      required: true
-      default: 'main'
-    version:
-      description: 'The version to release (e.g. 1.2.3). This workflow will automatically perform the required version bumps'
-      required: true
+    inputs:
+      ref:
+        description: 'Branch or tag ref to run the workflow on'
+        required: true
+        default: 'main'
+      version:
+        description: 'The version to release (e.g. 1.2.3). This workflow will automatically perform the required version bumps'
+        required: true
 
 env:
   RELEASE_VERSION: ${{ inputs.version }}
