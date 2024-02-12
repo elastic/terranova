@@ -72,6 +72,25 @@ poetry poe fmt
 
 ## Usage
 
+### How to install it
+
+```bash
+# For MacOSX Apple Silicon
+gh release download 0.1.0 -p '*-darwin-arm64' -O /usr/local/bin/terranova --clobber
+
+# For MacOSX Intel
+gh release download 0.1.0 -p '*-darwin-amd64' -O /usr/local/bin/terranova --clobber
+
+# For Linux arm64
+gh release download 0.1.0 -p '*-linux-arm64' -O /usr/local/bin/terranova --clobber
+
+# For Linux amd64
+gh release download 0.1.0 -p '*-linux-amd64' -O /usr/local/bin/terranova --clobber
+
+# Make it executable
+chmod +x /usr/local/bin/terranova
+```
+
 ### Define an arbitrary resource layout
 
 * `terranova` rely on the concept of resource groups.
