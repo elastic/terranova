@@ -7,6 +7,7 @@ import mdformat
 import sh
 from click.exceptions import Exit
 from jinja2 import Environment, PackageLoader
+from rich.table import Table
 
 from .binds import Terraform
 from .exceptions import (
@@ -59,7 +60,7 @@ def discover_resources(path: Path) -> list[Resource]:
         )
 
 
-def find_all_resource_dirs() -> list[(Path, str)]:
+def find_all_resource_dirs(resources_dir: Path) -> list[(Path, str)]:
     """
     Find all path where there is a resource manifest.
 
@@ -67,7 +68,7 @@ def find_all_resource_dirs() -> list[(Path, str)]:
         list of all path.
     """
     paths = []
-    resources_dir = SharedContext.resources_dir().as_posix()
+    resources_dir = resources_dir.as_posix()
     resources_dir_prefix_len = len(resources_dir) + 1
     for path, _, files in os.walk(resources_dir):
         for file in files:
@@ -86,11 +87,10 @@ def resource_dirs(path: str | None) -> list[(Path, str)]:
     Returns:
         list of all resource dirs.
     """
+    resources_dir = SharedContext.resources_dir()
     if path:
-        # Construct resources path
-        return [(SharedContext.resources_dir().joinpath(path), path)]
-    # Find all resources manifests
-    return find_all_resource_dirs()
+        resources_dir = resources_dir.joinpath(path)
+    return find_all_resource_dirs(resources_dir)
 
 
 def mount_context(full_path: Path, manifest: ResourcesManifest | None = None, import_vars: bool = False) -> Terraform:
@@ -193,17 +193,41 @@ def init(path: str | None) -> None:
 
 
 @click.command("get")
-@click.argument("path", type=str)
-def get(path: str) -> None:
+@click.argument("path", type=str, required=False)
+@click.option("--selector", type=str, required=False)
+def get(path: str | None, selector: str | None) -> None:
     """Display one or many resources."""
-    # Construct resources path
-    full_path = SharedContext.resources_dir().joinpath(path)
+    # Find all resources manifests
+    paths = resource_dirs(path)
 
-    # Ensure manifest exists and can be read
-    read_manifest(full_path)
+    # Selectors
+    selectors = {}
+    if selector:
+        data = selector.split("=", maxsplit=1)
+        selectors[data[0]] = None if len(data) == 1 else data[1]
 
-    resources = ResourcesFinder.find_in_dir(full_path)
-    print(resources)
+    # Render resources table
+    table = Table()
+    table.add_column("Path", justify="left", style="cyan", no_wrap=True)
+    table.add_column("Type", justify="left", style="green")
+    table.add_column("Name", style="magenta")
+    for full_path, rel_path in paths:
+        resources = discover_resources(full_path)
+        for resource in resources:
+            match = True
+            if selectors:
+                for key, value in selectors.items():
+                    attr_value = resource.attrs.get(key)
+                    if value and attr_value and attr_value != value:
+                        match = False
+                        break
+                    if not attr_value:
+                        match = False
+                        break
+
+            if match:
+                table.add_row(rel_path, resource.type, resource.name)
+    SharedContext.console().print(table)
 
 
 @click.command("fmt")
