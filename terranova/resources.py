@@ -67,9 +67,9 @@ class ResourcesRunbook:
     def exec(self, path: str, workdir: Path) -> None:
         """Try to execute the runbook."""
         env = {
-            "INFRACTL_PATH": path,
-            "INFRACTL_CONF_DIR": SharedContext.conf_dir().absolute().as_posix(),
-            "INFRACTL_RUNBOOK_NAME": self.name,
+            "TERRANOVA_PATH": path,
+            "TERRANOVA_CONF_DIR": SharedContext.conf_dir().absolute().as_posix(),
+            "TERRANOVA_RUNBOOK_NAME": self.name,
         }
         if os.getenv("PATH"):
             env["PATH"] = os.getenv("PATH")

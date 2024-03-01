@@ -35,7 +35,7 @@ from .utils import SharedContext
     help="Conf directory path.",
     type=click.Path(exists=True, path_type=Path),
     required=True,
-    envvar="INFRACTL_CONF_DIR",
+    envvar="TERRANOVA_CONF_DIR",
     default="./conf",
 )
 @click.version_option(__version__)
