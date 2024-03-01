@@ -121,6 +121,7 @@ class Log:
     def failure(cls, msgs, err: Exception | None = None, raise_exit: int | None = None) -> None:
         """
         Log a failure and exit if needed.
+
         Note: Thread-safe.
         Raises:
             Exit: if needed.
@@ -136,10 +137,13 @@ class Log:
             err_console.print(f"  {str(msg)}")
 
         # Render explained error
-        if err and isinstance(err, ExplainedError):
-            err_console.print(f"  Cause: {err.cause}")
-            if err.resolution:
-                err_console.print(f"  Resolution: {err.resolution}")
+        if err:
+            if isinstance(err, ExplainedError):
+                err_console.print(f"  Cause: {err.cause}")
+                if err.resolution:
+                    err_console.print(f"  Resolution: {err.resolution}")
+            else:
+                err_console.print(f"  Details: {err}")
 
         # Exit application
         if raise_exit:
