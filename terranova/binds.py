@@ -53,7 +53,7 @@ class Terraform(Bind):
         def is_allowed_env_var(env_var: str) -> bool:
             return (
                 env_var.startswith("TF_")
-                or env_var.startswith("INFRACTL_")
+                or env_var.startswith("TERRANOVA_")
                 # Implicit credentials for s3 backend
                 or env_var.startswith("AWS_")
                 or env_var in ["HOME", "PATH"]
