@@ -14,7 +14,8 @@ class Constants:
 
     # pylint: disable=R0903
     ENCODING_UTF_8: Final[str] = "utf-8"
-    PROJECT_PATH: Final[Path] = Path("pyproject.toml")
+    PYPROJECT_PATH: Final[Path] = Path("pyproject.toml")
+    TERRANOVA_INIT_PATH: Final[Path] = Path("./terranova/__init__.py")
     REGISTRY_URL: str = os.getenv("REGISTRY_URL", "local.dev")
 
 
@@ -27,7 +28,7 @@ def read_project_conf() -> dict[str, Any]:
         TomlDecodeError: if the `pyproject.toml` isn't valid.
     """
     try:
-        return dotty(toml.load(Constants.PROJECT_PATH.absolute().as_posix()))
+        return dotty(toml.load(Constants.PYPROJECT_PATH.absolute().as_posix()))
     except TomlDecodeError as err:
         print("The `pyproject.toml` file isn't valid", file=sys.stderr)
         raise err

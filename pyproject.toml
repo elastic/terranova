@@ -99,6 +99,27 @@ deps = [
 help = "Build standalone binary."
 script = "scripts.build:run"
 
+[tool.poe.tasks."release:pre"]
+deps = [
+  "env:configure"
+]
+help = "Create a PR with changes for release."
+script = "scripts.release:pre"
+
+[tool.poe.tasks."release"]
+deps = [
+  "env:configure"
+]
+help = "Create a new terranova release."
+script = "scripts.release:run"
+
+[tool.poe.tasks."release:post"]
+deps = [
+  "env:configure"
+]
+help = "Prepare next iteration."
+script = "scripts.release:post"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
