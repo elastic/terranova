@@ -10,11 +10,8 @@ on:
         required: true
         default: 'main'
       version:
-        description: 'The version to release (e.g. 1.2.3). This workflow will automatically perform the required version bumps'
+        description: 'The next iteration version. This workflow will automatically perform the required version bumps'
         required: true
-
-env:
-  RELEASE_VERSION: ${{ inputs.version }}
 
 permissions:
   contents: read
@@ -23,20 +20,7 @@ concurrency:
   group: ${{ github.workflow }}
 
 jobs:
-  validate-tag:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - name: Validate tag does not exist on current commit
-        uses: ./.github/workflows/validate-tag
-        with:
-          tag: ${{ env.RELEASE_VERSION }}
-
   build:
-    needs:
-      - validate-tag
     strategy:
       matrix:
         os:
@@ -71,13 +55,41 @@ jobs:
         with:
           merge-multiple: true
 
-      - name: Create the release tag
-        run: |
-          git tag "${RELEASE_VERSION}"
-          git push origin "${RELEASE_VERSION}"
+      - uses: ./.github/workflows/env-setup
 
-      - name: Create the release
+      - name: Release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create --generate-notes --latest --title="terranova v${RELEASE_VERSION}" "${RELEASE_VERSION}" ./terranova-*
+        run: poetry run poe release
+
+  post-release:
+    needs:
+      - release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: elastic/apm-pipeline-library/.github/actions/github-token@current
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+
+      - uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+        with:
+          username: ${{ env.GIT_USER }}
+          email: ${{ env.GIT_EMAIL }}
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          token: ${{ env.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: ./.github/workflows/env-setup
+
+      - name: Run post-release step
+        run: poetry run poe release:post
+        env:
+          NEXT_VERSION: ${{ inputs.version }}

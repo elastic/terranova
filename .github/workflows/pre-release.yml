@@ -1,0 +1,51 @@
+---
+
+name: Pre release
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch or tag ref to run the workflow on'
+        required: true
+        default: 'main'
+      version:
+        description: 'The version to release (e.g. 1.2.3). This workflow will automatically perform the required version bumps'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}
+
+jobs:
+  pre-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: elastic/apm-pipeline-library/.github/actions/github-token@current
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+
+      - uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+        with:
+          username: ${{ env.GIT_USER }}
+          email: ${{ env.GIT_EMAIL }}
+          token: ${{ env.GITHUB_TOKEN }}
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          token: ${{ env.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - uses: ./.github/workflows/env-setup
+
+      - name: Run pre-release step
+        run: poetry run poe release:pre
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
