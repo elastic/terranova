@@ -6,7 +6,7 @@ profile = "black"
 
 [tool.poetry]
 name = "terranova"
-version = "0.1.1-dev"
+version = "0.2.0"
 description = "Terranova is a thin wrapper for Terraform that provides extra tools and logic to handle Terraform configurations at scale."
 authors = ["Adrien Mannocci <adrien.mannocci@elastic.co>"]
 license = "Apache-2.0"
