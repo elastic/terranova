@@ -26,7 +26,7 @@ from scripts.utils import fatal
 def git_branch_delete(branch_name: str) -> None:
     """Delete a git branch if exists."""
     try:
-        git("branch", "-D", branch_name, _out=sys.stdout, _err=sys.stderr)
+        git("branch", "-D", branch_name)
     except ErrorReturnCode:
         pass
 
