@@ -37,6 +37,14 @@ class Constants:
     REGISTRY_URL: str = os.getenv("REGISTRY_URL", "local.dev")
 
 
+def fatal(msg: str, err: Exception | None = None) -> None:
+    """Print error message on stderr and die."""
+    print(msg, file=sys.stderr)
+    if err:
+        print(err, file=sys.stderr)
+    sys.exit(1)
+
+
 def read_project_conf() -> dict[str, Any]:
     """
     Read project configuration and returns a dict configuration.

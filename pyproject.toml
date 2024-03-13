@@ -87,7 +87,7 @@ script = "scripts.generate:run"
 [tool.poe.tasks.lint]
 deps = ["env:configure"]
 help = "Lint code project."
-cmd = "pylint terranova"
+script = "scripts.lint:run"
 
 [tool.poe.tasks.fmt]
 deps = ["env:configure"]
