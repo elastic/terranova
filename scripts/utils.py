@@ -1,3 +1,21 @@
+#
+# Copyright (c) 2024 Elastic.
+#
+# This file is part of terranova.
+# See https://github.com/elastic/terranova for further info.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 import os
 import sys
 from pathlib import Path
@@ -17,6 +35,14 @@ class Constants:
     PYPROJECT_PATH: Final[Path] = Path("pyproject.toml")
     TERRANOVA_INIT_PATH: Final[Path] = Path("./terranova/__init__.py")
     REGISTRY_URL: str = os.getenv("REGISTRY_URL", "local.dev")
+
+
+def fatal(msg: str, err: Exception | None = None) -> None:
+    """Print error message on stderr and die."""
+    print(msg, file=sys.stderr)
+    if err:
+        print(err, file=sys.stderr)
+    sys.exit(1)
 
 
 def read_project_conf() -> dict[str, Any]:
