@@ -63,7 +63,10 @@ cmd = "poetry up --latest"
 [tool.poe.tasks."project:license"]
 deps = ["env:configure"]
 help = "Add license header in codebase."
-cmd = "licenseheaders -t .copyright.tmpl -cy -o Elastic -n=terranova -u=https://github.com/elastic/terranova -d terranova -d scripts"
+sequence = [
+  { cmd = "licenseheaders -t .copyright.tmpl -d scripts" },
+  { cmd = "licenseheaders -t .copyright.tmpl -d terranova" }
+]
 
 [tool.poe.tasks.wipe]
 shell = """
