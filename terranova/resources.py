@@ -26,16 +26,17 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from re import Pattern
 
-import sh
 import yaml
 from dataclasses_json import config, dataclass_json
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
+from sh import Command
 
 from .exceptions import (
     InvalidManifestError,
     InvalidResourcesError,
     MissingManifestError,
+    MissingRunbookEnvError,
     UnreadableManifestError,
     VersionManifestError,
 )
@@ -74,7 +75,13 @@ class ResourcesRunbookEnv:
 @dataclass_json
 @dataclass(frozen=True)
 class ResourcesRunbook:
-    """Represents resources runbook"""
+    """
+    Represents resources runbook
+
+    Raises:
+        ErrorReturnCode: if the runbook exit with non-zero code.
+        MissingRunbookEnvError: if a forward env var is missing.
+    """
 
     name: str
     entrypoint: str
@@ -93,10 +100,16 @@ class ResourcesRunbook:
             env["PATH"] = os.getenv("PATH")
         if self.env:
             for entry in self.env:
-                env[entry.name] = entry.value if entry.value else os.getenv(entry.name)
+                if entry.value:
+                    env[entry.name] = entry.value
+                else:
+                    maybe_env_var = os.getenv(entry.name)
+                    if not maybe_env_var:
+                        raise MissingRunbookEnvError(entry.name)
+                    env[entry.name] = maybe_env_var
         if self.workdir:
             workdir = workdir.joinpath(self.workdir)
-        entrypoint = sh.Command(self.entrypoint)
+        entrypoint = Command(self.entrypoint)
         entrypoint(self.args, _env=env, _cwd=workdir, _in=sys.stdin, _out=sys.stdout, _err=sys.stderr)
 
 

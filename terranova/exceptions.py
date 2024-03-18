@@ -123,3 +123,14 @@ class MissingRunbookError(RunbookError):
             cause=f"The runbook `{name}` isn't defined`",
             resolution="Ensure the runbook is defined.",
         )
+
+
+class MissingRunbookEnvError(RunbookError):
+    """Represents a missing runbook environment variables error."""
+
+    def __init__(self, env_name: str) -> None:
+        """Init missing runbook environment variables error."""
+        super().__init__(
+            cause=f"The environment variable `{env_name}` isn't defined.",
+            resolution="Ensure the environment variable is defined before running the runbook.",
+        )

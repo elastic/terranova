@@ -32,6 +32,7 @@ from .exceptions import (
     AmbiguousRunbookError,
     InvalidResourcesError,
     ManifestError,
+    MissingRunbookEnvError,
     MissingRunbookError,
 )
 from .resources import Resource, ResourcesFinder, ResourcesManifest
@@ -484,5 +485,7 @@ def runbook(path: str, name: str) -> None:
     executable_runbook = next(iter(matching_runbooks))
     try:
         executable_runbook.exec(path, full_path / "runbooks")
+    except MissingRunbookEnvError as err:
+        Log.failure("find environment variable", err, raise_exit=1)
     except sh.ErrorReturnCode as err:
         raise Exit(code=err.exit_code) from err
