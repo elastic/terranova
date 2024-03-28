@@ -49,3 +49,21 @@ jobs:
 
       - name: Build
         run: poetry run poe build
+
+  test:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup environment
+        uses: ./.github/workflows/env-setup
+
+      - name: Install terraform binary
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Test
+        run: poetry run poe test
