@@ -102,13 +102,21 @@ class Terraform(Bind):
         kwargs["_cwd"] = self.__work_dir
         return super()._exec(*args, **kwargs)
 
-    def init(self, reconfigure=False, upgrade=False, backend_config: dict[str, str] = None) -> None:
+    def init(
+        self,
+        backend_config: dict[str, str] = None,
+        migrate_state: bool = False,
+        reconfigure: bool = False,
+        upgrade: bool = False,
+    ) -> None:
         """Prepare your working directory for other commands."""
         args = ["init"]
         if reconfigure:
             args.append("-reconfigure")
         if upgrade:
             args.append("-upgrade")
+        if migrate_state:
+            args.append("-migrate-state")
         if backend_config:
             for key, value in backend_config.items():
                 args.append(f"-backend-config={key}={value}")

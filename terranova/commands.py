@@ -145,9 +145,13 @@ def extract_output_var(path: str, name: str) -> str:
         raise Exit(code=err.exit_code) from err
 
 
+# pylint: disable=R0914
 @click.command("init")
 @click.argument("path", type=str, required=False)
-def init(path: str | None) -> None:
+@click.option("--upgrade", help="Install the latest module and provider versions.", is_flag=True)
+@click.option("--migrate-state", help="Reconfigure a backend, and attempt to migrate any existing state.", is_flag=True)
+@click.option("--reconfigure", help="Reconfigure a backend, ignoring any saved configuration.", is_flag=True)
+def init(path: str | None, upgrade: bool, migrate_state: bool, reconfigure: bool) -> None:
     """Init resources manifest."""
     # Find all resources manifests
     paths = resource_dirs(path)
@@ -199,12 +203,12 @@ def init(path: str | None) -> None:
                 Log.failure(f"delete the directory at: {dir_path.as_posix()}", raise_exit=1)
 
         try:
-            already_init = (full_path / ".terraform").exists()
             # Mount terraform context
             terraform = mount_context(full_path, manifest)
             terraform.init(
-                reconfigure=already_init,
-                upgrade=already_init,
+                reconfigure=reconfigure,
+                upgrade=upgrade,
+                migrate_state=migrate_state,
                 backend_config={"key": os.path.relpath(full_path, SharedContext.resources_dir())},
             )
         except sh.ErrorReturnCode as err:
