@@ -27,122 +27,22 @@ from click.exceptions import Exit
 from jinja2 import Environment, PackageLoader
 from rich.table import Table
 
-from .binds import Terraform
-from .exceptions import (
+from terranova.commands.helpers import (
+    Selector,
+    SelectorType,
+    discover_resources,
+    extract_output_var,
+    mount_context,
+    read_manifest,
+    resource_dirs,
+)
+from terranova.exceptions import (
     AmbiguousRunbookError,
     InvalidResourcesError,
-    ManifestError,
     MissingRunbookEnvError,
     MissingRunbookError,
 )
-from .resources import Resource, ResourcesFinder, ResourcesManifest
-from .utils import Constants, Log, SharedContext
-
-
-# pylint: disable=R1710
-def read_manifest(path: Path) -> "ResourcesManifest":
-    """
-    Read the resources manifest if possible.
-    This function handle errors by logging and exiting.
-
-    Args:
-        path: path to manifest directory.
-
-    Returns:
-        the manifest.
-    """
-    try:
-        return ResourcesManifest.from_file(path / Constants.MANIFEST_FILE_NAME)
-    except ManifestError as err:
-        Log.failure("read manifest", err, raise_exit=1)
-
-
-# pylint: disable=R1710
-def discover_resources(path: Path) -> list[Resource]:
-    """
-    Discover resources in every terraform configuration files.
-    This function handle errors by logging and exiting.
-
-    Args:
-        path: path to resources directory.
-
-    Returns:
-        list of resources.
-    """
-    try:
-        return ResourcesFinder.find_in_dir(path)
-    except InvalidResourcesError as err:
-        Log.failure(
-            f"discover resources at `{path.as_posix()}`",
-            err,
-            raise_exit=1,
-        )
-
-
-def find_all_resource_dirs(resources_dir: Path) -> list[(Path, str)]:
-    """
-    Find all path where there is a resource manifest.
-
-    Returns:
-        list of all path.
-    """
-    paths = []
-    resources_dir = resources_dir.as_posix()
-    resources_dir_prefix_len = len(resources_dir) + 1
-    for path, _, files in os.walk(resources_dir):
-        for file in files:
-            if os.path.basename(file) == Constants.MANIFEST_FILE_NAME:
-                paths.append((Path(path), path[resources_dir_prefix_len:]))
-    return paths
-
-
-def resource_dirs(path: str | None) -> list[(Path, str)]:
-    """
-    List of all resource dirs to interact with.
-
-    Args:
-        path: use a specific path.
-
-    Returns:
-        list of all resource dirs.
-    """
-    resources_dir = SharedContext.resources_dir()
-    if path:
-        resources_dir = resources_dir.joinpath(path)
-    return find_all_resource_dirs(resources_dir)
-
-
-def mount_context(full_path: Path, manifest: ResourcesManifest | None = None, import_vars: bool = False) -> Terraform:
-    """Mount the terraform context by importing variables if needed."""
-    # Ensure manifest exists and can be read
-    if not manifest:
-        manifest = read_manifest(full_path)
-
-    # Import variables
-    if manifest.imports and import_vars:
-        variables = {}
-        for importer in manifest.imports:
-            target = importer.target if importer.target else importer.resource
-            variables[target] = extract_output_var(importer.source, importer.resource)
-    else:
-        variables = None
-
-    return Terraform(full_path, variables)
-
-
-def extract_output_var(path: str, name: str) -> str:
-    """Show output values from your root module."""
-    # Construct resources path
-    full_path = SharedContext.resources_dir().joinpath(path)
-
-    # Mount terraform context
-    terraform = mount_context(full_path)
-
-    # Execute output command
-    try:
-        return terraform.output(name)
-    except sh.ErrorReturnCode as err:
-        raise Exit(code=err.exit_code) from err
+from terranova.utils import Constants, Log, SharedContext
 
 
 # pylint: disable=R0914
@@ -175,19 +75,20 @@ def init(path: str | None, upgrade: bool, migrate_state: bool, reconfigure: bool
             os.chdir(full_path.as_posix())
 
             # Create new symbolic links
-            for dependency in manifest.dependencies:
-                try:
-                    target_dirname = os.path.dirname(dependency.target)
-                    os.symlink(
-                        os.path.relpath(
-                            SharedContext.shared_dir().joinpath(dependency.source).as_posix(),
-                            full_path.joinpath(target_dirname).as_posix(),
-                        ),
-                        dependency.target,
-                    )
-                except FileExistsError:
-                    # The symlink already exists and it's probably fine
-                    pass
+            if manifest.dependencies:
+                for dependency in manifest.dependencies:
+                    try:
+                        target_dirname = os.path.dirname(dependency.target)
+                        os.symlink(
+                            os.path.relpath(
+                                SharedContext.shared_dir().joinpath(dependency.source).as_posix(),
+                                full_path.joinpath(target_dirname).as_posix(),
+                            ),
+                            dependency.target,
+                        )
+                    except FileExistsError:
+                        # The symlink already exists and it's probably fine
+                        pass
         finally:
             os.chdir(cwd)
 
@@ -217,17 +118,11 @@ def init(path: str | None, upgrade: bool, migrate_state: bool, reconfigure: bool
 
 @click.command("get")
 @click.argument("path", type=str, required=False)
-@click.option("--selector", type=str, required=False)
-def get(path: str | None, selector: str | None) -> None:
+@click.option("--selector", "selectors", type=SelectorType(), required=False, multiple=True)
+def get(path: str | None, selectors: list[Selector] | None) -> None:
     """Display one or many resources."""
     # Find all resources manifests
     paths = resource_dirs(path)
-
-    # Selectors
-    selectors = {}
-    if selector:
-        data = selector.split("=", maxsplit=1)
-        selectors[data[0]] = None if len(data) == 1 else data[1]
 
     # Render resources table
     table = Table()
@@ -235,21 +130,9 @@ def get(path: str | None, selector: str | None) -> None:
     table.add_column("Type", justify="left", style="green")
     table.add_column("Name", style="magenta")
     for full_path, rel_path in paths:
-        resources = discover_resources(full_path)
+        resources = discover_resources(full_path, selectors)
         for resource in resources:
-            match = True
-            if selectors:
-                for key, value in selectors.items():
-                    attr_value = resource.attrs.get(key)
-                    if value and attr_value and attr_value != value:
-                        match = False
-                        break
-                    if not attr_value:
-                        match = False
-                        break
-
-            if match:
-                table.add_row(rel_path, resource.type, resource.name)
+            table.add_row(rel_path, resource.type, resource.name)
     SharedContext.console().print(table)
 
 
