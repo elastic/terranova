@@ -129,7 +129,7 @@ class ResourcesManifest:
     """Represents a resources manifest"""
 
     metadata: ResourcesMetadata
-    dependencies: list[ResourcesDependency]
+    dependencies: list[ResourcesDependency] | None = None
     runbooks: list[ResourcesRunbook] | None = None
     imports: list[ResourcesImport] | None = None
 
@@ -186,6 +186,26 @@ class Resource:
     attrs: dict[str, list[str]]
 
 
+@dataclass
+class Selector:
+    """Represents a resource selector."""
+
+    name: str
+    value: str | None = None
+
+    def match(self, resource: Resource) -> bool:
+        """
+        Returns:
+            true if the selector matches the resource, otherwise false.
+        """
+        attr_value = resource.attrs.get(self.name)
+        if self.value and attr_value and self.value not in attr_value:
+            return False
+        if not attr_value:
+            return False
+        return True
+
+
 class ResourcesFinder:
     """Represents a resources finder able to find resources in files and directories."""
 
@@ -196,7 +216,7 @@ class ResourcesFinder:
     __RESOURCE_ATTR_PATTERN: Pattern = re.compile(r"""@(?P<attr_name>\S+)\s+(?P<attr_value>.+)""")
 
     @staticmethod
-    def find_in_dir(path: Path) -> list[Resource]:
+    def find_in_dir(path: Path, selectors: list[Selector] | None = None) -> list[Resource]:
         """
         Find all resources in directory.
 
@@ -209,16 +229,18 @@ class ResourcesFinder:
         """
         resources = []
         for file in sorted(path.glob("*.tf")):
-            resources += ResourcesFinder.find_in_file(file)
+            resources += ResourcesFinder.find_in_file(file, selectors)
         return resources
 
+    # pylint: disable=R0914
     @staticmethod
-    def find_in_file(path: Path) -> list[Resource]:
+    def find_in_file(path: Path, selectors: list[Selector] | None = None) -> list[Resource]:
         """
         Find all resources in a file.
 
         Args:
             path: path to file.
+            selectors: optional list of selectors.
         Returns:
             list of resources in a file.
         Raises:
@@ -255,6 +277,15 @@ class ResourcesFinder:
                 if attr_match:
                     name, value = attr_match.groups()
                     attrs[name].append(value)
+            resource = Resource(name=resource_name, type=resource_type, attrs=attrs)
 
-            resources.append(Resource(name=resource_name, type=resource_type, attrs=attrs))
+            # Filter resource by selector
+            match = True
+            if selectors:
+                for selector in selectors:
+                    match = selector.match(resource)
+                    if not match:
+                        break
+            if match:
+                resources.append(resource)
         return resources

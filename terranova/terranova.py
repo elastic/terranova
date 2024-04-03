@@ -21,7 +21,7 @@ from pathlib import Path
 import click
 
 from . import __version__
-from .commands import (
+from .commands.binds import (
     apply,
     define,
     destroy,
