@@ -18,7 +18,7 @@
 #
 from pathlib import Path
 from threading import Lock
-from typing import Final
+from typing import Any, Final, NoReturn
 
 from click.exceptions import Exit
 from rich.console import Console
@@ -41,14 +41,11 @@ class Constants:
 
 
 class SharedContext:
-    """
-    Utility class to share context globally.
-    Note: Thread-safe.
-    """
+    """Utility class to share context globally."""
 
     # Shard context
-    __UNDERLYING = {}
-    __LOCK = Lock()
+    __UNDERLYING: dict[str, Any] = {}
+    __LOCK: Lock = Lock()
 
     @staticmethod
     def init(debug: bool, verbose: bool, conf_dir: Path) -> None:
@@ -121,29 +118,17 @@ class Log:
 
     @classmethod
     def action(cls, msg) -> None:
-        """
-        Log an action.
-        Note: Thread-safe.
-        """
+        """Log an action."""
         SharedContext.console().print(f"[yellow]⇒[/yellow] {str(msg)}")
 
     @classmethod
     def success(cls, msg) -> None:
-        """
-        Log a success.
-        Note: Thread-safe.
-        """
+        """Log a success."""
         SharedContext.console().print(f"[green]✓[/green] Succeeded to {str(msg)}")
 
     @classmethod
-    def failure(cls, msgs, err: Exception | None = None, raise_exit: int | None = None) -> None:
-        """
-        Log a failure and exit if needed.
-
-        Note: Thread-safe.
-        Raises:
-            Exit: if needed.
-        """
+    def failure(cls, msgs: str | list[str], err: Exception | None = None) -> None:
+        """Log a failure."""
         err_console = SharedContext.err_console()
         if SharedContext.is_debug_enabled() and err:
             err_console.print_exception()
@@ -163,6 +148,8 @@ class Log:
             else:
                 err_console.print(f"  Details: {err}")
 
-        # Exit application
-        if raise_exit:
-            raise Exit(code=raise_exit) from err
+    @classmethod
+    def fatal(cls, msgs: str | list[str], err: Exception | None = None, raise_exit: int = 1) -> NoReturn:
+        """Log a failure and exit."""
+        Log.failure(msgs, err)
+        raise Exit(code=raise_exit)

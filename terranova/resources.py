@@ -96,8 +96,9 @@ class ResourcesRunbook:
             "TERRANOVA_CONF_DIR": SharedContext.conf_dir().absolute().as_posix(),
             "TERRANOVA_RUNBOOK_NAME": self.name,
         }
-        if os.getenv("PATH"):
-            env["PATH"] = os.getenv("PATH")
+        cmd_path = os.getenv("PATH")
+        if cmd_path:
+            env["PATH"] = cmd_path
         if self.env:
             for entry in self.env:
                 if entry.value:

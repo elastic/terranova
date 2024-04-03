@@ -61,7 +61,7 @@ def read_manifest(path: Path) -> "ResourcesManifest":
     try:
         return ResourcesManifest.from_file(path / Constants.MANIFEST_FILE_NAME)
     except ManifestError as err:
-        Log.failure("read manifest", err, raise_exit=1)
+        Log.fatal("read manifest", err)
 
 
 # pylint: disable=R1710
@@ -80,23 +80,22 @@ def discover_resources(path: Path, selectors: list[Selector] | None = None) -> l
     try:
         return ResourcesFinder.find_in_dir(path, selectors)
     except InvalidResourcesError as err:
-        Log.failure(
+        Log.fatal(
             f"discover resources at `{path.as_posix()}`",
             err,
-            raise_exit=1,
         )
 
 
-def find_all_resource_dirs(resources_dir: Path) -> list[(Path, str)]:
+def find_all_resource_dirs(resources_dir: Path) -> list[tuple[Path, str]]:
     """
     Find all path where there is a resource manifest.
 
     Returns:
         list of all path.
     """
-    paths = []
-    resources_dir = resources_dir.as_posix()
-    resources_dir_prefix_len = len(resources_dir) + 1
+    paths: list[tuple[Path, str]] = []
+    resources_dir_path = resources_dir.as_posix()
+    resources_dir_prefix_len = len(resources_dir_path) + 1
     for path, _, files in os.walk(resources_dir):
         for file in files:
             if os.path.basename(file) == Constants.MANIFEST_FILE_NAME:
@@ -104,7 +103,7 @@ def find_all_resource_dirs(resources_dir: Path) -> list[(Path, str)]:
     return paths
 
 
-def resource_dirs(path: str | None) -> list[(Path, str)]:
+def resource_dirs(path: str | None) -> list[tuple[Path, str]]:
     """
     List of all resource dirs to interact with.
 
@@ -127,13 +126,12 @@ def mount_context(full_path: Path, manifest: ResourcesManifest | None = None, im
         manifest = read_manifest(full_path)
 
     # Import variables
+    variables: dict[str, str] | None = None
     if manifest.imports and import_vars:
         variables = {}
         for importer in manifest.imports:
             target = importer.target if importer.target else importer.resource
             variables[target] = extract_output_var(importer.source, importer.resource)
-    else:
-        variables = None
 
     return Terraform(full_path, variables)
 
