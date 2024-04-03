@@ -13,3 +13,4 @@ runtime
 *.hcl
 outputs
 last-cli-checks
+reports
