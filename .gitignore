@@ -14,3 +14,4 @@ runtime
 outputs
 last-cli-checks
 reports
+pyrightconfig.json

@@ -37,11 +37,13 @@ class Bind:
 
     def _exec(self, *args, **kwargs) -> RunningCommand:
         """Run the command and handle lifecycle in case we kill the parent process."""
-        process = None
+        process: RunningCommand | None = None
         try:
             kwargs = {**kwargs, **{"_bg": True, "_bg_exc": False}}
-            process = self.__cmd(*args, **kwargs)
-            return process.wait()
+            running_process = self.__cmd(*args, **kwargs)
+            if isinstance(running_process, RunningCommand):
+                return running_process.wait()
+            raise ValueError
         finally:
             if process is not None and process.is_alive():
                 process.kill()
@@ -55,12 +57,12 @@ class Terraform(Bind):
         try:
             super().__init__(cmd=Command("terraform"))
         except CommandNotFound as err:
-            Log.failure("detect terraform binary", err, raise_exit=1)
+            Log.fatal("detect terraform binary", err)
 
         try:
             SharedContext.terraform_shared_plugin_cache_dir().mkdir(parents=True, exist_ok=True)
         except OSError as err:
-            Log.failure("create terraform cache directory", err, raise_exit=1)
+            Log.fatal("create terraform cache directory", err)
 
         self.__work_dir = work_dir
         self.__variables = variables
@@ -104,7 +106,7 @@ class Terraform(Bind):
 
     def init(
         self,
-        backend_config: dict[str, str] = None,
+        backend_config: dict[str, str] | None = None,
         migrate_state: bool = False,
         reconfigure: bool = False,
         upgrade: bool = False,

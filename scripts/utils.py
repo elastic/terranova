@@ -19,7 +19,7 @@
 import os
 import sys
 from pathlib import Path
-from typing import Any, Final
+from typing import Any, Final, NoReturn
 
 import toml
 from dotty_dict import dotty
@@ -33,11 +33,12 @@ class Constants:
     # pylint: disable=R0903
     ENCODING_UTF_8: Final[str] = "utf-8"
     PYPROJECT_PATH: Final[Path] = Path("pyproject.toml")
-    TERRANOVA_INIT_PATH: Final[Path] = Path("./terranova/__init__.py")
+    PYRIGHTCONFIG_PATH: Final[Path] = Path("pyrightconfig.json")
     REGISTRY_URL: str = os.getenv("REGISTRY_URL", "local.dev")
+    TERRANOVA_INIT_PATH: Final[Path] = Path("./terranova/__init__.py")
 
 
-def fatal(msg: str, err: Exception | None = None) -> None:
+def fatal(msg: str, err: Exception | None = None) -> NoReturn:
     """Print error message on stderr and die."""
     print(msg, file=sys.stderr)
     if err:
@@ -58,6 +59,19 @@ def read_project_conf() -> dict[str, Any]:
     except TomlDecodeError as err:
         print("The `pyproject.toml` file isn't valid", file=sys.stderr)
         raise err
+
+
+def detect_poetry() -> Command:
+    """
+    Try to detect poetry.
+
+    Returns:
+        a command if poetry is detected.
+    """
+    try:
+        return Command("poetry")
+    except CommandNotFound:
+        fatal("`poetry` isn't detected")
 
 
 def container_backend() -> tuple[Command, dict[str, str]]:

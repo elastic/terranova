@@ -101,7 +101,7 @@ def init(path: str | None, upgrade: bool, migrate_state: bool, reconfigure: bool
                     if not any(dir_path.iterdir()):
                         dir_path.rmdir()
             except OSError:
-                Log.failure(f"delete the directory at: {dir_path.as_posix()}", raise_exit=1)
+                Log.fatal(f"delete the directory at: {dir_path.as_posix()}")
 
         try:
             # Mount terraform context
@@ -177,11 +177,7 @@ def validate(path: str | None) -> None:
             terraform.validate()
             Log.success(f"validate resources at `{full_path.as_posix()}`.")
         except InvalidResourcesError as err:
-            Log.failure(
-                f"validate resources at `{full_path.as_posix()}`.",
-                err,
-                raise_exit=1,
-            )
+            Log.fatal(f"validate resources at `{full_path.as_posix()}`.", err)
 
 
 @click.command("docs")
@@ -362,17 +358,17 @@ def runbook(path: str, name: str) -> None:
     manifest = read_manifest(full_path)
 
     # Extract runbook
-    matching_runbooks = [rb for rb in manifest.runbooks if rb.name == name]
+    matching_runbooks = [rb for rb in manifest.runbooks if rb.name == name] if manifest.runbooks else []
     if not matching_runbooks:
-        Log.failure("execute runbook", MissingRunbookError(name), raise_exit=1)
+        Log.fatal("execute runbook", MissingRunbookError(name))
     if len(matching_runbooks) > 1:
-        Log.failure("execute runbook", AmbiguousRunbookError(name), raise_exit=1)
+        Log.fatal("execute runbook", AmbiguousRunbookError(name))
 
     # Execute runbook
     executable_runbook = next(iter(matching_runbooks))
     try:
         executable_runbook.exec(path, full_path / "runbooks")
     except MissingRunbookEnvError as err:
-        Log.failure("find environment variable", err, raise_exit=1)
+        Log.fatal("find environment variable", err)
     except sh.ErrorReturnCode as err:
         raise Exit(code=err.exit_code) from err
