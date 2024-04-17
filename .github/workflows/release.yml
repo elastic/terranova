@@ -28,6 +28,9 @@ jobs:
           - macos-13
           - ubuntu-latest
     runs-on: ${{ matrix.os }}
+    permissions:
+      id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@v4
 
@@ -36,6 +39,10 @@ jobs:
 
       - name: Build
         run: poetry run poe build
+
+      - uses: github-early-access/generate-build-provenance@main
+        with:
+          subject-path: 'dist/*'
 
       - uses: actions/upload-artifact@v4
         with:
