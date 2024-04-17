@@ -3,6 +3,12 @@
 name: env-setup
 description: Setup environment
 
+inputs:
+  shell:
+    description: 'Default shell'
+    default: 'bash'
+    required: false
+
 runs:
   using: "composite"
   steps:
@@ -21,4 +27,4 @@ runs:
       run: |
         pip3 install --no-cache-dir --upgrade pip poetry
         poetry install --no-interaction
-      shell: 'bash'
+      shell: ${{ inputs.shell }}
