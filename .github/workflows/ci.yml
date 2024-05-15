@@ -1,5 +1,4 @@
 ---
-
 name: CI
 
 on:
@@ -25,8 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup environment
-        uses: ./.github/workflows/env-setup
+      - name: Install environment
+        uses: ./.github/workflows/env-install
 
       - name: Lint
         run: poetry run poe lint
@@ -44,8 +43,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup environment
-        uses: ./.github/workflows/env-setup
+      - name: Install environment
+        uses: ./.github/workflows/env-install
 
       - name: Build
         run: poetry run poe build
@@ -57,8 +56,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup environment
-        uses: ./.github/workflows/env-setup
+      - name: Install environment
+        uses: ./.github/workflows/env-install
 
       - name: Install terraform binary
         uses: hashicorp/setup-terraform@v3

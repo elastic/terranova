@@ -1,16 +1,15 @@
 ---
-
 name: Release
 
 on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'Branch or tag ref to run the workflow on'
+        description: "Branch or tag ref to run the workflow on"
         required: true
-        default: 'main'
+        default: "main"
       version:
-        description: 'The next iteration version. This workflow will automatically perform the required version bumps'
+        description: "The next iteration version. This workflow will automatically perform the required version bumps"
         required: true
 
 permissions:
@@ -34,20 +33,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup environment
-        uses: ./.github/workflows/env-setup
+      - name: Install environment
+        uses: ./.github/workflows/env-install
 
       - name: Build
         run: poetry run poe build
 
-      - uses: actions/attest-build-provenance@951c0c5f8e375ad4efad33405ab77f7ded2358e4  # v1.1.1
+      - uses: actions/attest-build-provenance@951c0c5f8e375ad4efad33405ab77f7ded2358e4 # v1.1.1
         with:
-          subject-path: 'dist/*'
+          subject-path: "dist/*"
 
       - uses: actions/upload-artifact@v4
         with:
           name: terranova-${{ matrix.os }}
-          path: 'dist/*'
+          path: "dist/*"
 
   release:
     runs-on: ubuntu-latest
@@ -62,7 +61,8 @@ jobs:
         with:
           merge-multiple: true
 
-      - uses: ./.github/workflows/env-setup
+      - name: Install environment
+        uses: ./.github/workflows/env-install
 
       - name: Release
         env:
@@ -86,7 +86,8 @@ jobs:
           token: ${{ secrets.EPHEMERAL_GH_TOKEN }}
           fetch-depth: 0
 
-      - uses: ./.github/workflows/env-setup
+      - name: Install environment
+        uses: ./.github/workflows/env-install
 
       - name: Run post-release step
         run: poetry run poe release:post
