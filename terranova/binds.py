@@ -143,9 +143,18 @@ class Terraform(Bind):
         """Reformat your configuration in the standard style."""
         self._exec("fmt", _inherit=True)
 
-    def plan(self) -> None:
+    # pylint: disable=redefined-builtin
+    def plan(self, compact_warnings: bool, input: bool, no_color: bool, parallelism: int) -> None:
         """Show changes required by the current configuration."""
-        self._exec("plan", _inherit=True)
+        args = ["plan"]
+        if compact_warnings:
+            args.append("-compact-warnings")
+        args.append("-input=true" if input else "-input=false")
+        if no_color:
+            args.append("-no-color")
+        if parallelism and parallelism != 10:  # Default value is 10
+            args.append(f"-parallelism={parallelism}")
+        self._exec(*args, _inherit=True)
 
     def apply(self, auto_approve: bool = False, target: str | None = None) -> None:
         """Create or update infrastructure."""
