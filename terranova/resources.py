@@ -212,7 +212,7 @@ class ResourcesFinder:
 
     # Resource patterns
     __RESOURCE_PATTERN: Pattern = re.compile(
-        r"""(/\*(?P<comments>[@\S\s\n]*?)\*/\n)?resource \"(?P<resource_type>\w+)\" \"(?P<resource_name>\w+)\""""
+        r"""(/\*(?P<comments>[@\S\s\n]*?)\*/\n)?resource \"(?P<resource_type>\w+)\" \"(?P<resource_name>[a-zA-Z0-9_-]+)\""""
     )
     __RESOURCE_ATTR_PATTERN: Pattern = re.compile(r"""@(?P<attr_name>\S+)\s+(?P<attr_value>.+)""")
 
