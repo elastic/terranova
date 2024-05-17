@@ -104,10 +104,12 @@ class Terraform(Bind):
         kwargs["_cwd"] = self.__work_dir
         return super()._exec(*args, **kwargs)
 
+    # pylint: disable=too-many-arguments
     def init(
         self,
         backend_config: dict[str, str] | None = None,
         migrate_state: bool = False,
+        no_backend: bool = False,
         reconfigure: bool = False,
         upgrade: bool = False,
     ) -> None:
@@ -119,6 +121,8 @@ class Terraform(Bind):
             args.append("-upgrade")
         if migrate_state:
             args.append("-migrate-state")
+        if no_backend:
+            args.append("-backend=false")
         if backend_config:
             for key, value in backend_config.items():
                 args.append(f"-backend-config={key}={value}")
