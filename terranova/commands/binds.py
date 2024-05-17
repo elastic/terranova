@@ -219,9 +219,18 @@ def docs(docs_dir: Path) -> None:
         target_path.with_suffix(".md").write_text(data=formatted, encoding=Constants.ENCODING_UTF_8)
 
 
+# pylint: disable=redefined-builtin
 @click.command("plan")
 @click.argument("path", type=str, required=False)
-def plan(path: str | None) -> None:
+@click.option(
+    "--compact-warnings",
+    help="If Terraform produces any warnings that are not by errors, show them in a more compact that includes only the summary messages.",
+    is_flag=True,
+)
+@click.option("--input/--no-input", help="Ask for input for variables if not directly set.", default=True)
+@click.option("--no-color", help="If specified, output won't contain any color.", is_flag=True)
+@click.option("--parallelism", help="Limit the number of parallel resource operations.", type=int, default=10)
+def plan(path: str | None, compact_warnings: bool, input: bool, no_color: bool, parallelism: int) -> None:
     """Show changes required by the current configuration."""
     # Find all resources manifests
     paths = resource_dirs(path)
@@ -235,7 +244,7 @@ def plan(path: str | None) -> None:
 
         # Execute plan command
         try:
-            terraform.plan()
+            terraform.plan(compact_warnings=compact_warnings, input=input, no_color=no_color, parallelism=parallelism)
         except sh.ErrorReturnCode as err:
             raise Exit(code=err.exit_code) from err
 
