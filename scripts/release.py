@@ -21,9 +21,9 @@ import re
 import sys
 from pathlib import Path
 
-from sh import ErrorReturnCode, gh, git
+from sh import ErrorReturnCode
 
-from scripts.utils import Constants, read_project_conf
+from scripts.utils import Constants, detect_gh, detect_git, read_project_conf
 
 
 def __set_version(version: str) -> None:
@@ -59,6 +59,7 @@ def pre() -> None:
 
     # Create a new branch
     branch_name = f"release/v{release_version}"
+    git = detect_git()
     git("checkout", "-b", branch_name, _out=sys.stdout, _err=sys.stderr)
 
     # Update all files
@@ -70,6 +71,7 @@ def pre() -> None:
     git("push", "origin", branch_name, _out=sys.stdout, _err=sys.stderr)
 
     # Create a PR
+    gh = detect_gh()
     gh(
         "pr",
         "create",
@@ -88,6 +90,7 @@ def run() -> None:
 
     # Create the release tag
     try:
+        git = detect_git()
         git("tag", release_version)
         git("push", "origin", release_version)
     except ErrorReturnCode:
@@ -104,6 +107,7 @@ def run() -> None:
     ]
     binaries = [file.absolute().as_posix() for file in Path(".").glob("./terranova-*")]
     args.extend(binaries)
+    gh = detect_gh()
     gh(args, _out=sys.stdout, _err=sys.stderr)
 
 
@@ -117,6 +121,7 @@ def post() -> None:
 
     # Create a new branch
     branch_name = f"feat/post-release-v{next_version}"
+    git = detect_git()
     git("checkout", "-b", branch_name, _out=sys.stdout, _err=sys.stderr)
 
     # Update all files
@@ -135,6 +140,7 @@ def post() -> None:
     git("push", "origin", branch_name, _out=sys.stdout, _err=sys.stderr)
 
     # Create a PR
+    gh = detect_gh()
     gh(
         "pr",
         "create",
