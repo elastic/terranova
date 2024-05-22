@@ -34,7 +34,7 @@ under the License.
 {% if resource.attrs.name | length > 0 %}
 ### {{ resource.attrs.name | first }}
 {% else %}
-### {{ resource.name }} - {{ resource.type }}
+### {{ resource.block_type }} - {{ resource.name }} - {{ resource.type }}
 {% endif %}
 
 {% for key, values in resource.attrs.items() -%}
