@@ -54,10 +54,21 @@ from terranova.utils import Constants, Log, SharedContext
 )
 @click.option("--reconfigure", help="Reconfigure a backend, ignoring any saved configuration.", is_flag=True)
 @click.option("--upgrade", help="Install the latest module and provider versions.", is_flag=True)
-def init(path: str | None, migrate_state: bool, no_backend: bool, reconfigure: bool, upgrade: bool) -> None:
+@click.option(
+    "--fail-at-end",
+    help="If specified, only fail afterwards; allow all non-impacted projects to continue.",
+    default=False,
+    is_flag=True,
+)
+def init(
+    path: str | None, migrate_state: bool, no_backend: bool, reconfigure: bool, upgrade: bool, fail_at_end: bool
+) -> None:
     """Init resources manifest."""
     # Find all resources manifests
     paths = resource_dirs(path)
+
+    # Store errors if fail_at_end
+    errors = False
 
     # Init all paths
     for full_path, rel_path in paths:
@@ -117,7 +128,16 @@ def init(path: str | None, migrate_state: bool, no_backend: bool, reconfigure: b
                 upgrade=upgrade,
             )
         except sh.ErrorReturnCode as err:
-            raise Exit(code=err.exit_code) from err
+            error = Exit(code=err.exit_code)
+            if fail_at_end:
+                errors = True
+                Log.failure(error)
+            else:
+                raise error from err
+
+    # Report any errors if fail_at_end has been enabled
+    if fail_at_end and errors:
+        raise Exit(code=1)
 
 
 @click.command("get")
@@ -163,10 +183,19 @@ def fmt(path: str) -> None:
 
 @click.command("validate")
 @click.argument("path", type=str, required=False)
-def validate(path: str | None) -> None:
+@click.option(
+    "--fail-at-end",
+    help="If specified, only fail afterwards; allow all non-impacted projects to continue.",
+    default=False,
+    is_flag=True,
+)
+def validate(path: str | None, fail_at_end: bool) -> None:
     """Check whether the configuration is valid."""
     # Find all resources manifests
     paths = resource_dirs(path)
+
+    # Store errors if fail_at_end
+    errors = False
 
     # Format all paths
     for full_path, rel_path in paths:
@@ -176,12 +205,22 @@ def validate(path: str | None) -> None:
         terraform = mount_context(full_path)
         discover_resources(full_path)
 
+        mesage = f"validate resources at `{full_path.as_posix()}`."
+
         # Format resources files
         try:
             terraform.validate()
-            Log.success(f"validate resources at `{full_path.as_posix()}`.")
+            Log.success(mesage)
         except InvalidResourcesError as err:
-            Log.fatal(f"validate resources at `{full_path.as_posix()}`.", err)
+            if fail_at_end:
+                Log.failure(mesage)
+                errors = True
+            else:
+                Log.fatal(mesage, err)
+
+    # Report any errors if fail_at_end has been enabled
+    if fail_at_end and errors:
+        Log.fatal("The syntax is probably incorrect in one of the projects. See above for errors.")
 
 
 @click.command("docs")
@@ -234,10 +273,21 @@ def docs(docs_dir: Path) -> None:
 @click.option("--input/--no-input", help="Ask for input for variables if not directly set.", default=True)
 @click.option("--no-color", help="If specified, output won't contain any color.", is_flag=True)
 @click.option("--parallelism", help="Limit the number of parallel resource operations.", type=int, default=10)
-def plan(path: str | None, compact_warnings: bool, input: bool, no_color: bool, parallelism: int) -> None:
+@click.option(
+    "--fail-at-end",
+    help="If specified, only fail afterwards; allow all non-impacted projects to continue.",
+    default=False,
+    is_flag=True,
+)
+def plan(
+    path: str | None, compact_warnings: bool, input: bool, no_color: bool, parallelism: int, fail_at_end: bool
+) -> None:
     """Show changes required by the current configuration."""
     # Find all resources manifests
     paths = resource_dirs(path)
+
+    # Store errors if fail_at_end
+    errors = False
 
     # Format all paths
     for full_path, rel_path in paths:
@@ -250,17 +300,35 @@ def plan(path: str | None, compact_warnings: bool, input: bool, no_color: bool, 
         try:
             terraform.plan(compact_warnings=compact_warnings, input=input, no_color=no_color, parallelism=parallelism)
         except sh.ErrorReturnCode as err:
-            raise Exit(code=err.exit_code) from err
+            error = Exit(code=err.exit_code)
+            if fail_at_end:
+                errors = True
+                Log.failure(error)
+            else:
+                raise error from err
+
+    # Report any errors if fail_at_end has been enabled
+    if fail_at_end and errors:
+        raise Exit(code=1)
 
 
 @click.command("apply")
 @click.argument("path", type=str, required=False)
 @click.option("--auto-approve", help="Skip interactive approval of plan before applying.", is_flag=True)
 @click.option("--target", help="Apply changes for specific target.", type=str)
-def apply(path: str | None, auto_approve: bool, target: str) -> None:
+@click.option(
+    "--fail-at-end",
+    help="If specified, only fail afterwards; allow all non-impacted projects to continue.",
+    default=False,
+    is_flag=True,
+)
+def apply(path: str | None, auto_approve: bool, target: str, fail_at_end: bool) -> None:
     """Create or update resources."""
     # Find all resources manifests
     paths = resource_dirs(path)
+
+    # Store errors if fail_at_end
+    errors = False
 
     # Format all paths
     for full_path, rel_path in paths:
@@ -273,7 +341,16 @@ def apply(path: str | None, auto_approve: bool, target: str) -> None:
         try:
             terraform.apply(auto_approve, target)
         except sh.ErrorReturnCode as err:
-            raise Exit(code=err.exit_code) from err
+            error = Exit(code=err.exit_code)
+            if fail_at_end:
+                errors = True
+                Log.failure(error)
+            else:
+                raise error from err
+
+    # Report any errors if fail_at_end has been enabled
+    if fail_at_end and errors:
+        raise Exit(code=1)
 
 
 @click.command("destroy")
