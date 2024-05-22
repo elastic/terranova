@@ -60,9 +60,11 @@ from terranova.utils import Constants, Log, SharedContext
     default=False,
     is_flag=True,
 )
+# pylint: disable-next=R0913
 def init(
     path: str | None, migrate_state: bool, no_backend: bool, reconfigure: bool, upgrade: bool, fail_at_end: bool
 ) -> None:
+    # pylint: disable=R0912
     """Init resources manifest."""
     # Find all resources manifests
     paths = resource_dirs(path)
@@ -279,6 +281,7 @@ def docs(docs_dir: Path) -> None:
     default=False,
     is_flag=True,
 )
+# pylint: disable-next=R0913
 def plan(
     path: str | None, compact_warnings: bool, input: bool, no_color: bool, parallelism: int, fail_at_end: bool
 ) -> None:
