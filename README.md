@@ -87,7 +87,17 @@ poetry poe fmt
 
 ## 📖 Usage
 
-### How to install it
+### How to install it using Brew
+
+```bash
+# Install custom terranova tap
+brew tap elastic/terranova
+
+# Install terranova
+brew install terranova
+```
+
+### How to install as Standalone
 
 ```bash
 # For MacOSX Apple Silicon
