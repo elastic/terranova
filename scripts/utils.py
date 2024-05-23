@@ -74,6 +74,34 @@ def detect_poetry() -> Command:
         fatal("`poetry` isn't detected")
 
 
+def detect_git() -> Command:
+    try:
+        return Command("git")
+    except CommandNotFound:
+        fatal("`git` isn't installed")
+
+
+def detect_gh() -> Command:
+    try:
+        return Command("gh")
+    except CommandNotFound:
+        fatal("`gh` isn't installed")
+
+
+def detect_pyinstaller() -> Command:
+    try:
+        return Command("pyinstaller")
+    except CommandNotFound:
+        fatal("`pyinstaller` isn't installed")
+
+
+def detect_pylint() -> Command:
+    try:
+        return Command("pylint")
+    except CommandNotFound:
+        fatal("`pylint` isn't installed")
+
+
 def container_backend() -> tuple[Command, dict[str, str]]:
     """
     Try to detect a container backend.

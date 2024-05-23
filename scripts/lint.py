@@ -18,14 +18,15 @@
 #
 import sys
 
-from sh import ErrorReturnCode, git, poetry, pylint
+from sh import ErrorReturnCode
 
-from scripts.utils import fatal
+from scripts.utils import detect_git, detect_poetry, detect_pylint, fatal
 
 
 def git_branch_delete(branch_name: str) -> None:
     """Delete a git branch if exists."""
     try:
+        git = detect_git()
         git("branch", "-D", branch_name)
     except ErrorReturnCode:
         pass
@@ -34,6 +35,7 @@ def git_branch_delete(branch_name: str) -> None:
 def check_pylint() -> None:
     print("Checking codebase")
     try:
+        pylint = detect_pylint()
         pylint("terranova", _out=sys.stdout, _err=sys.stderr)
     except ErrorReturnCode as err:
         # Forward exit code without traceback
@@ -42,6 +44,7 @@ def check_pylint() -> None:
 
 def check_license_headers() -> None:
     print("Checking license headers")
+    git = detect_git()
     head_commit_hash = git("rev-parse", "HEAD", _err=sys.stderr).strip()
     current_branch_name = git("rev-parse", "--abbrev-ref", "HEAD").strip()
     branch_name = f"automation/lint-{head_commit_hash}"
@@ -51,6 +54,7 @@ def check_license_headers() -> None:
         git("checkout", "-b", branch_name, _in=sys.stdin, _out=sys.stdout, _err=sys.stderr)
 
         # Apply headers licence
+        poetry = detect_poetry()
         poetry("poe", "project:license", _in=sys.stdin, _out=sys.stdout, _err=sys.stderr)
 
         # Validate

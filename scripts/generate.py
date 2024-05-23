@@ -18,7 +18,7 @@
 #
 import sys
 
-from sh import pyinstaller
+from scripts.utils import detect_pyinstaller
 
 
 def run() -> None:
@@ -32,4 +32,5 @@ def run() -> None:
             "./bin/terranova",
         ]
     )
+    pyinstaller = detect_pyinstaller()
     pyinstaller(args, _out=sys.stdout, _err=sys.stderr)
