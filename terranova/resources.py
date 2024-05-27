@@ -23,6 +23,7 @@ import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
+from enum import StrEnum
 from pathlib import Path
 from re import Pattern
 
@@ -164,6 +165,8 @@ class ResourcesManifest:
             # Get configuration schema
             try:
                 schema = pkgutil.get_data(__name__, f"schemas/manifest_schema_v{version}.json")
+                if not schema:
+                    raise FileNotFoundError(f"The schema `schemas/manifest_schema_v{version}.json` can't be found")
             except FileNotFoundError as err:
                 raise VersionManifestError(version) from err
             schema = json.loads(schema)
@@ -175,13 +178,21 @@ class ResourcesManifest:
                 raise InvalidManifestError(path) from err
             # noinspection PyUnresolvedReferences
             # pylint: disable=E1101
-            return ResourcesManifest.from_dict(data)
+            return ResourcesManifest.from_dict(data)  # type: ignore[attr-defined]
+
+
+class ResourceBlockType(StrEnum):
+    """Represents a resource block type."""
+
+    DATA = "data"
+    RESOURCE = "resource"
 
 
 @dataclass
 class Resource:
     """Represents a resource."""
 
+    block_type: ResourceBlockType
     name: str
     type: str
     attrs: dict[str, list[str]]
@@ -212,7 +223,7 @@ class ResourcesFinder:
 
     # Resource patterns
     __RESOURCE_PATTERN: Pattern = re.compile(
-        r"""(/\*(?P<comments>[@\S\s\n]*?)\*/\n)?resource \"(?P<resource_type>\w+)\" \"(?P<resource_name>[a-zA-Z0-9_-]+)\""""
+        r"""(/\*(?P<comments>[@\S\s\n]*?)\*/\n)?(?P<resource_block_type>resource|data) \"(?P<resource_type>\w+)\" \"(?P<resource_name>[a-zA-Z0-9_-]+)\""""
     )
     __RESOURCE_ATTR_PATTERN: Pattern = re.compile(r"""@(?P<attr_name>\S+)\s+(?P<attr_value>.+)""")
 
@@ -243,7 +254,7 @@ class ResourcesFinder:
             path: path to file.
             selectors: optional list of selectors.
         Returns:
-            list of resources in a file.
+            list of resources in a directory.
         Raises:
             InvalidResourcesError: if a resource doesn't have metadata.
         """
@@ -257,17 +268,18 @@ class ResourcesFinder:
         for resource_match in detected_resources:
             # Extract match groups
             if len(resource_match) < 4:
-                _, resource_type, resource_name = resource_match
-                raise InvalidResourcesError(
-                    cause=f"The resource `{resource_type}:{resource_name}` at `{path.as_posix()}` isn't describe.",
-                    resolution="Add metadata for the above resource.",
-                )
+                _, resource_block_type, resource_type, resource_name = resource_match
+                if resource_block_type == ResourceBlockType.RESOURCE:
+                    raise InvalidResourcesError(
+                        cause=f"The resource `{resource_block_type}:{resource_type}:{resource_name}` at `{path.as_posix()}` isn't describe.",
+                        resolution="Add metadata for the above resource.",
+                    )
 
-            _, maybe_resource_attrs, resource_type, resource_name = resource_match
+            _, maybe_resource_attrs, resource_block_type, resource_type, resource_name = resource_match
             maybe_resource_attrs = maybe_resource_attrs.strip()
-            if not maybe_resource_attrs:
+            if not maybe_resource_attrs and resource_block_type == ResourceBlockType.RESOURCE:
                 raise InvalidResourcesError(
-                    cause=f"The resource `{resource_type}:{resource_name}` at `{path.as_posix()}` isn't describe.",
+                    cause=f"The resource `{resource_block_type}:{resource_type}:{resource_name}` at `{path.as_posix()}` isn't describe.",
                     resolution="Add metadata for the above resource.",
                 )
 
@@ -278,7 +290,7 @@ class ResourcesFinder:
                 if attr_match:
                     name, value = attr_match.groups()
                     attrs[name].append(value)
-            resource = Resource(name=resource_name, type=resource_type, attrs=attrs)
+            resource = Resource(block_type=resource_block_type, name=resource_name, type=resource_type, attrs=attrs)
 
             # Filter resource by selector
             match = True
