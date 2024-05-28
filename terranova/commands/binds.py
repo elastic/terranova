@@ -129,7 +129,7 @@ def init(
                 reconfigure=reconfigure,
                 upgrade=upgrade,
             )
-        except sh.ErrorReturnCode as err:
+        except sh.ErrorReturnCode:
             errors = True
             if not fail_at_end:
                 break
@@ -210,7 +210,7 @@ def validate(path: str | None, fail_at_end: bool) -> None:
         try:
             terraform.validate()
             Log.success(message)
-        except InvalidResourcesError as err:
+        except InvalidResourcesError:
             errors = True
             Log.failure(message)
             if not fail_at_end:
@@ -298,7 +298,7 @@ def plan(
         # Execute plan command
         try:
             terraform.plan(compact_warnings=compact_warnings, input=input, no_color=no_color, parallelism=parallelism)
-        except sh.ErrorReturnCode as err:
+        except sh.ErrorReturnCode:
             errors = True
             if not fail_at_end:
                 break
@@ -336,7 +336,7 @@ def apply(path: str | None, auto_approve: bool, target: str, fail_at_end: bool) 
         # Execute apply command
         try:
             terraform.apply(auto_approve, target)
-        except sh.ErrorReturnCode as err:
+        except sh.ErrorReturnCode:
             errors = True
             if not fail_at_end:
                 break
