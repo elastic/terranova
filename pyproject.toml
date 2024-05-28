@@ -72,7 +72,7 @@ deps = ["env:configure"]
 help = "Add license header in codebase."
 sequence = [
     { cmd = "licenseheaders -t .copyright.tmpl -d scripts" },
-    { cmd = "licenseheaders -t .copyright.tmpl -d terranova" },
+    { cmd = "licenseheaders -t .copyright.tmpl -d terranova --exclude terranova/templates/resources.md" },
 ]
 
 [tool.poe.tasks.wipe]
