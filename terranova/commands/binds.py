@@ -130,15 +130,12 @@ def init(
                 upgrade=upgrade,
             )
         except sh.ErrorReturnCode as err:
-            error = Exit(code=err.exit_code)
-            if fail_at_end:
-                errors = True
-                Log.failure(error)
-            else:
-                raise error from err
+            errors = True
+            if not fail_at_end:
+                break
 
     # Report any errors if fail_at_end has been enabled
-    if fail_at_end and errors:
+    if errors:
         raise Exit(code=1)
 
 
@@ -207,21 +204,20 @@ def validate(path: str | None, fail_at_end: bool) -> None:
         terraform = mount_context(full_path)
         discover_resources(full_path)
 
-        mesage = f"validate resources at `{full_path.as_posix()}`."
+        message = f"validate resources at `{full_path.as_posix()}`."
 
         # Format resources files
         try:
             terraform.validate()
-            Log.success(mesage)
+            Log.success(message)
         except InvalidResourcesError as err:
-            if fail_at_end:
-                Log.failure(mesage)
-                errors = True
-            else:
-                Log.fatal(mesage, err)
+            errors = True
+            Log.failure(message)
+            if not fail_at_end:
+                break
 
     # Report any errors if fail_at_end has been enabled
-    if fail_at_end and errors:
+    if errors:
         Log.fatal("The syntax is probably incorrect in one of the projects. See above for errors.")
 
 
@@ -303,15 +299,12 @@ def plan(
         try:
             terraform.plan(compact_warnings=compact_warnings, input=input, no_color=no_color, parallelism=parallelism)
         except sh.ErrorReturnCode as err:
-            error = Exit(code=err.exit_code)
-            if fail_at_end:
-                errors = True
-                Log.failure(error)
-            else:
-                raise error from err
+            errors = True
+            if not fail_at_end:
+                break
 
     # Report any errors if fail_at_end has been enabled
-    if fail_at_end and errors:
+    if errors:
         raise Exit(code=1)
 
 
@@ -344,15 +337,12 @@ def apply(path: str | None, auto_approve: bool, target: str, fail_at_end: bool) 
         try:
             terraform.apply(auto_approve, target)
         except sh.ErrorReturnCode as err:
-            error = Exit(code=err.exit_code)
-            if fail_at_end:
-                errors = True
-                Log.failure(error)
-            else:
-                raise error from err
+            errors = True
+            if not fail_at_end:
+                break
 
     # Report any errors if fail_at_end has been enabled
-    if fail_at_end and errors:
+    if errors:
         raise Exit(code=1)
 
 
