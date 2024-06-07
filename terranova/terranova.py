@@ -34,6 +34,7 @@ from .commands.binds import (
     plan,
     runbook,
     taint,
+    untaint,
     validate,
 )
 from .utils import SharedContext
@@ -75,4 +76,5 @@ main.add_command(output)
 main.add_command(plan)
 main.add_command(runbook)
 main.add_command(taint)
+main.add_command(untaint)
 main.add_command(validate)

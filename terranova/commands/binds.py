@@ -402,6 +402,24 @@ def taint(path: str, address: str) -> None:
         raise Exit(code=err.exit_code) from err
 
 
+@click.command("untaint")
+@click.argument("path", type=str)
+@click.argument("address", type=str)
+def untaint(path: str, address: str) -> None:
+    """Remove the 'tainted' state from a resource instance."""
+    # Construct resources path
+    full_path = SharedContext.resources_dir().joinpath(path)
+
+    # Mount terraform context
+    terraform = mount_context(full_path, import_vars=True)
+
+    # Execute untaint command
+    try:
+        terraform.untaint(address)
+    except sh.ErrorReturnCode as err:
+        raise Exit(code=err.exit_code) from err
+
+
 @click.command("import")
 @click.argument("path", type=str)
 @click.argument("address", type=str)
