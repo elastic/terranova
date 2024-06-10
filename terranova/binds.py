@@ -177,6 +177,10 @@ class Terraform(Bind):
         """Mark a resource as not fully functional."""
         self._exec("taint", address, _inherit=True)
 
+    def untaint(self, address: str) -> None:
+        """Remove the 'tainted' state from a resource instance."""
+        self._exec("untaint", address, _inherit=True)
+
     def output(self, name: str) -> str:
         """Show output values from your root module."""
         result = self._exec("output", "-raw", name, _in=sys.stdin, _err=sys.stderr)
