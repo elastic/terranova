@@ -455,3 +455,15 @@ def runbook(path: str, name: str) -> None:
         Log.fatal("find environment variable", err)
     except sh.ErrorReturnCode as err:
         raise Exit(code=err.exit_code) from err
+
+
+@click.command("ls")
+@click.argument("path", type=str, required=False)
+def ls(path: str | None) -> None:
+    """List resources."""
+    # Find all resources manifests
+    paths = resource_dirs(path)
+
+    # Display resource paths
+    for full_path, _ in paths:
+        print(full_path)
