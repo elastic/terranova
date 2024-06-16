@@ -30,6 +30,7 @@ from .commands.binds import (
     get,
     graph,
     init,
+    ls,
     output,
     plan,
     runbook,
@@ -72,6 +73,7 @@ main.add_command(fmt)
 main.add_command(get)
 main.add_command(graph)
 main.add_command(init)
+main.add_command(ls)
 main.add_command(output)
 main.add_command(plan)
 main.add_command(runbook)
