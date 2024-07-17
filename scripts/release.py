@@ -29,7 +29,14 @@ from scripts.utils import Constants, detect_gh, detect_git, read_project_conf
 def __set_version(version: str) -> None:
     # Update app version
     try:
-        Constants.TERRANOVA_INIT_PATH.write_text(f"""__version__ = \"{version}\"\n""")
+        data = Constants.TERRANOVA_INIT_PATH.read_text()
+    except Exception as err:
+        print(f"The `{Constants.TERRANOVA_INIT_PATH.as_posix()}` can't be read", file=sys.stderr)
+        raise err
+
+    data = re.sub(r"__version__ = \"(.*)\"", f'__version__ = "{version}"', data, count=1)
+    try:
+        Constants.TERRANOVA_INIT_PATH.write_text(data)
     except Exception as err:
         print(f"The `{Constants.TERRANOVA_INIT_PATH.as_posix()}` file can't be written", file=sys.stderr)
         raise err

@@ -22,3 +22,8 @@ runs:
         pip3 install --no-cache-dir --upgrade pip poetry
         poetry install --no-interaction
       shell: "bash"
+
+    - name: Install poetry plugins
+      run: |
+        poetry self add 'poethepoet[poetry_plugin]'
+      shell: 'bash'

@@ -26,6 +26,8 @@
 
 - [Python 3.11+](https://docs.python.org/3/) for development.
 - [Poetry](https://python-poetry.org/) for build system.
+- [Poe](https://poethepoet.natn.io/installation.html#install-poe-the-poet-as-a-poetry-plugin) for task runner.
+- [Up](https://github.com/MousaZeidBaker/poetry-plugin-up) for dependency updates.
 - [Podman](https://podman.io/docs) for container packaging.
 - [pre-commit](https://pre-commit.com/) for git management.
 
@@ -101,16 +103,16 @@ brew install terranova
 
 ```bash
 # For MacOSX Apple Silicon
-gh release download 0.3.0 -p '*-darwin-arm64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
+gh release download 0.4.0 -p '*-darwin-arm64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
 
 # For MacOSX Intel
-gh release download 0.3.0 -p '*-darwin-amd64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
+gh release download 0.4.0 -p '*-darwin-amd64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
 
 # For Linux arm64
-gh release download 0.3.0 -p '*-linux-arm64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
+gh release download 0.4.0 -p '*-linux-arm64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
 
 # For Linux amd64
-gh release download 0.3.0 -p '*-linux-amd64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
+gh release download 0.4.0 -p '*-linux-amd64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
 
 # Make it executable
 chmod +x /usr/local/bin/terranova
