@@ -76,6 +76,8 @@ class Terraform(Bind):
                 or env_var.startswith("TERRANOVA_")
                 # Implicit credentials for s3 backend
                 or env_var.startswith("AWS_")
+                # Forward asdf for shims support
+                or env_var.startswith("ASDF_")
                 or env_var in ["HOME", "PATH"]
             )
 
