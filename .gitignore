@@ -1,7 +1,7 @@
 *.egg-info
 *.pyc
 .vscode
-venv
+.venv
 build
 dist
 .idea
