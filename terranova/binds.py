@@ -150,7 +150,9 @@ class Terraform(Bind):
         self._exec("fmt", _inherit=True)
 
     # pylint: disable=redefined-builtin
-    def plan(self, compact_warnings: bool, input: bool, no_color: bool, parallelism: int) -> None:
+    def plan(
+        self, compact_warnings: bool, input: bool, no_color: bool, parallelism: int, detailed_exitcode: bool
+    ) -> None:
         """Show changes required by the current configuration."""
         args = ["plan"]
         if compact_warnings:
@@ -160,6 +162,8 @@ class Terraform(Bind):
             args.append("-no-color")
         if parallelism and parallelism != 10:  # Default value is 10
             args.append(f"-parallelism={parallelism}")
+        if detailed_exitcode:
+            args.append("-detailed-exitcode")
         self._exec(*args, _inherit=True)
 
     def apply(self, auto_approve: bool = False, target: str | None = None) -> None:

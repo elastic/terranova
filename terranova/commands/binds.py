@@ -277,9 +277,27 @@ def docs(docs_dir: Path) -> None:
     default=False,
     is_flag=True,
 )
+@click.option(
+    "--detailed-exitcode",
+    help="""
+    \b
+    Return detailed exit codes when the command exits.
+    This will change the meaning of exit codes to:
+    0 - Succeeded, diff is empty (no changes)
+    1 - Errored
+    2 - Succeeded, there is a diff
+    """,
+    is_flag=True,
+)
 # pylint: disable-next=R0913
 def plan(
-    path: str | None, compact_warnings: bool, input: bool, no_color: bool, parallelism: int, fail_at_end: bool
+    path: str | None,
+    compact_warnings: bool,
+    input: bool,
+    no_color: bool,
+    parallelism: int,
+    fail_at_end: bool,
+    detailed_exitcode: bool,
 ) -> None:
     """Show changes required by the current configuration."""
     # Find all resources manifests
@@ -297,7 +315,13 @@ def plan(
 
         # Execute plan command
         try:
-            terraform.plan(compact_warnings=compact_warnings, input=input, no_color=no_color, parallelism=parallelism)
+            terraform.plan(
+                compact_warnings=compact_warnings,
+                input=input,
+                no_color=no_color,
+                parallelism=parallelism,
+                detailed_exitcode=detailed_exitcode,
+            )
         except sh.ErrorReturnCode:
             errors = True
             if not fail_at_end:
