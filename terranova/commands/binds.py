@@ -305,8 +305,9 @@ def plan(
 
     # Store errors if fail_at_end
     errors = False
-    # We start with the highest possible error exit code, in the following loop we will replace it with the minimum value
-    # So if there is at least one error with exit code 1, the final exit code will be 1
+    # We start with the highest possible error exit code from https://developer.hashicorp.com/terraform/cli/commands/plan#detailed-exitcode.
+    # In the following loop we will replace it with the minimum value, so if there is at least one error with exit code 1,
+    # the final exit code will be 1, otherwise 2.
     error_exit_code = 2
 
     # Format all paths
