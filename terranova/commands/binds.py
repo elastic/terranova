@@ -305,6 +305,9 @@ def plan(
 
     # Store errors if fail_at_end
     errors = False
+    # We start with the highest possible error exit code, in the following loop we will replace it with the minimum value
+    # So if there is at least one error with exit code 1, the final exit code will be 1
+    error_exit_code = 2
 
     # Format all paths
     for full_path, rel_path in paths:
@@ -322,14 +325,15 @@ def plan(
                 parallelism=parallelism,
                 detailed_exitcode=detailed_exitcode,
             )
-        except sh.ErrorReturnCode:
+        except sh.ErrorReturnCode as err:
             errors = True
+            error_exit_code = min(error_exit_code, err.exit_code)
             if not fail_at_end:
                 break
 
     # Report any errors if fail_at_end has been enabled
     if errors:
-        raise Exit(code=1)
+        raise Exit(code=error_exit_code)
 
 
 @click.command("apply")
