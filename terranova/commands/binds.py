@@ -305,6 +305,7 @@ def plan(
 
     # Store errors if fail_at_end
     errors = False
+    error_exit_codes = []
 
     # Format all paths
     for full_path, rel_path in paths:
@@ -322,14 +323,20 @@ def plan(
                 parallelism=parallelism,
                 detailed_exitcode=detailed_exitcode,
             )
-        except sh.ErrorReturnCode:
+        except sh.ErrorReturnCode as err:
             errors = True
+            error_exit_codes.append(err.exit_code)
             if not fail_at_end:
                 break
 
     # Report any errors if fail_at_end has been enabled
     if errors:
-        raise Exit(code=1)
+        # The error_exit_codes list contains the numbers 1, 2, or both if detailed-exitcode is enabled.
+        # See https://developer.hashicorp.com/terraform/cli/commands/plan#detailed-exitcode fur further details.
+        # If 1 is present, the plan failed for at least one path, hence we should return 1.
+        # If all exit codes are 2, the plan succeeded for all paths, but there are changes, hence we should return 2.
+        exit_code = 1 if 1 in error_exit_codes else 2
+        raise Exit(code=exit_code)
 
 
 @click.command("apply")
