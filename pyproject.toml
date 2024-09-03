@@ -26,7 +26,7 @@ classifiers = [
 packages = [{ include = "terranova" }]
 
 [tool.poetry.scripts]
-terranova = "terranova.terranova:main"
+terranova = "terranova.cli:main"
 
 [tool.poetry.urls]
 "Changelog" = "https://github.com/elastic/terranova/CHANGELOG.md"

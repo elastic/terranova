@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
 
-from terranova.terranova import main
+from terranova.cli import main
 
 main()
