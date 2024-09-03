@@ -26,16 +26,15 @@ from scripts.utils import (
     container_backend,
     detect_git,
     detect_pyinstaller,
-    read_project_conf,
+    project_version,
 )
 
 
 def run() -> None:
-    conf = read_project_conf()
     git = detect_git()
     commit_hash_short = git("rev-parse", "--short", "HEAD").strip()
     current_time_epoch = int(time())
-    version = conf.get("tool.poetry.version")
+    version = project_version()
     python_version = platform.python_version()
 
     image_id = f"{version}-{current_time_epoch}-{commit_hash_short}"
