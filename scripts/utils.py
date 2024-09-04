@@ -19,12 +19,9 @@
 import os
 import sys
 from pathlib import Path
-from typing import Any, Final, NoReturn
+from typing import Final, NoReturn
 
-import toml
-from dotty_dict import dotty
 from sh import Command, CommandNotFound
-from toml import TomlDecodeError
 
 
 class Constants:
@@ -46,21 +43,6 @@ def fatal(msg: str, err: Exception | None = None) -> NoReturn:
     sys.exit(1)
 
 
-def read_project_conf() -> dict[str, Any]:
-    """
-    Read project configuration and returns a dict configuration.
-    Returns:
-        dict configuration.
-    Raises:
-        TomlDecodeError: if the `pyproject.toml` isn't valid.
-    """
-    try:
-        return dotty(toml.load(Constants.PYPROJECT_PATH.absolute().as_posix()))
-    except TomlDecodeError as err:
-        print("The `pyproject.toml` file isn't valid", file=sys.stderr)
-        raise err
-
-
 def detect_poetry() -> Command:
     """
     Try to detect poetry.
@@ -75,6 +57,11 @@ def detect_poetry() -> Command:
 
 
 def detect_git() -> Command:
+    """
+    Try to detect git.
+    Returns:
+        a command if git is detected.
+    """
     try:
         return Command("git")
     except CommandNotFound:
@@ -82,24 +69,61 @@ def detect_git() -> Command:
 
 
 def detect_gh() -> Command:
+    """
+    Try to detect gh.
+    Returns:
+        a command if gh is detected.
+    """
     try:
         return Command("gh")
     except CommandNotFound:
         fatal("`gh` isn't installed")
 
 
+def detect_pylint() -> Command:
+    """
+    Try to detect pylint.
+    Returns:
+        a command if pylint is detected.
+    """
+    try:
+        return Command("pylint")
+    except CommandNotFound:
+        fatal("`pylint` isn't installed")
+
+
 def detect_pyinstaller() -> Command:
+    """
+    Try to detect pyinstaller.
+    Returns:
+        a command if pyinstaller is detected.
+    """
     try:
         return Command("pyinstaller")
     except CommandNotFound:
         fatal("`pyinstaller` isn't installed")
 
 
-def detect_pylint() -> Command:
+def detect_pre_commit() -> Command | None:
+    """
+    Try to detect pre-commit.
+    Returns:
+        a command if pre-commit is detected.
+    """
     try:
-        return Command("pylint")
+        return Command("pre-commit")
     except CommandNotFound:
-        fatal("`pylint` isn't installed")
+        return None
+
+
+def project_version() -> str:
+    """
+    Returns:
+        current project version.
+    """
+    poetry = detect_poetry()
+    version = poetry("version", "-s", _err=sys.stderr)
+    return version.strip()
 
 
 def container_backend() -> tuple[Command, dict[str, str]]:

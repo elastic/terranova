@@ -23,7 +23,7 @@ from pathlib import Path
 
 from sh import ErrorReturnCode
 
-from scripts.utils import Constants, detect_gh, detect_git, read_project_conf
+from scripts.utils import Constants, detect_gh, detect_git, project_version
 
 
 def __set_version(version: str) -> None:
@@ -92,8 +92,7 @@ def pre() -> None:
 
 def run() -> None:
     # Read project version
-    conf = read_project_conf()
-    release_version = conf.get("tool.poetry.version")
+    release_version = project_version()
 
     # Create the release tag
     try:
