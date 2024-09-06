@@ -1,7 +1,11 @@
 ---
 name: Environment installation
 description: Install python, poetry, and dependencies
-
+inputs:
+  only:
+    description: 'The only dependency groups to include'
+    required: true
+    default: 'main,dev,build'
 runs:
   using: "composite"
   steps:
@@ -17,13 +21,18 @@ runs:
       with:
         python-version-file: ".python-version"
 
-    - name: Install poetry and dependencies
+    - name: Install poetry
       run: |
         pip3 install --no-cache-dir --upgrade pip poetry
-        poetry install --no-interaction
       shell: "bash"
 
     - name: Install poetry plugins
       run: |
         poetry self add 'poethepoet[poetry_plugin]'
+      shell: 'bash'
+
+    - name: Install dependencies
+      run: |
+        poetry install --no-interaction --sync --only "${{ inputs.only }}"
+        poetry poe env:configure
       shell: 'bash'
