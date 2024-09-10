@@ -10,8 +10,9 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    excludes=['setuptools', 'setuptools._vendor', 'setuptools._vendor.importlib_metadata'],
     noarchive=False,
+    optimize=0,
 )
 pyz = PYZ(a.pure)
 

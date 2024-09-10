@@ -45,6 +45,8 @@ jobs:
 
       - name: Install environment
         uses: ./.github/workflows/env-install
+        with:
+          only: 'main,build'
 
       - name: Build
         run: poetry run poe build
