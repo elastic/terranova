@@ -76,7 +76,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: elastic/apm-pipeline-library/.github/actions/setup-git@current
+      - uses: elastic/oblt-actions/git/setup@v1
         with:
           token: ${{ secrets.EPHEMERAL_GH_TOKEN }}
 
