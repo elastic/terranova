@@ -78,7 +78,7 @@ jobs:
     steps:
       - uses: elastic/oblt-actions/git/setup@v1
         with:
-          token: ${{ secrets.EPHEMERAL_GH_TOKEN }}
+          github-token: ${{ secrets.EPHEMERAL_GH_TOKEN }}
 
       - uses: actions/checkout@v4
         with:
