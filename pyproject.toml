@@ -41,7 +41,7 @@ jinja2 = "^3.1.4"           # BSD
 jsonschema = "^4.23.0"      # MIT
 mdformat = "^0.7.17"        # MIT
 overrides = "^7.7.0"        # Apache-2.0
-rich = "^13.8.0"            # MIT
+rich = "^13.8.1"            # MIT
 sh = "^2.0.7"               # MIT
 
 [tool.poetry.group.build.dependencies]
@@ -52,7 +52,7 @@ black = "^24.8.0"           # MIT
 isort = "^5.13.2"           # MIT
 licenseheaders = "^0.8.8"   # MIT
 pylint = "^3.2.7"           # GPL-2.0: https://github.com/pylint-dev/pylint/blob/main/LICENSE
-pytest = "^8.3.2"           # MIT
+pytest = "^8.3.3"           # MIT
 pytest-timeout = "^2.3.1"   # MIT
 pytest-xdist = "^3.6.1"     # MIT
 
