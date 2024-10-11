@@ -320,6 +320,8 @@ def plan(
         # Mount terraform context
         terraform = mount_context(full_path, import_vars=True)
 
+        unique_out_path = os.path.join(out, f"{rel_path}-tfplan")
+
         # Execute plan command
         try:
             terraform.plan(
@@ -328,7 +330,7 @@ def plan(
                 no_color=no_color,
                 parallelism=parallelism,
                 detailed_exitcode=detailed_exitcode,
-                out=out,
+                out=unique_out_path,
             )
         except sh.ErrorReturnCode as err:
             errors = True
