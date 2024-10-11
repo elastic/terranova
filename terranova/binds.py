@@ -151,7 +151,7 @@ class Terraform(Bind):
 
     # pylint: disable=redefined-builtin
     def plan(
-        self, compact_warnings: bool, input: bool, no_color: bool, parallelism: int, detailed_exitcode: bool
+        self, compact_warnings: bool, input: bool, no_color: bool, parallelism: int, detailed_exitcode: bool, out: str
     ) -> None:
         """Show changes required by the current configuration."""
         args = ["plan"]
@@ -164,6 +164,8 @@ class Terraform(Bind):
             args.append(f"-parallelism={parallelism}")
         if detailed_exitcode:
             args.append("-detailed-exitcode")
+        if out:
+            args.append(f"-out={out}")
         self._exec(*args, _inherit=True)
 
     def apply(self, auto_approve: bool = False, target: str | None = None) -> None:

@@ -289,6 +289,11 @@ def docs(docs_dir: Path) -> None:
     """,
     is_flag=True,
 )
+@click.option(
+    "--out",
+    help="Write a plan file to the given path. This can be used as input to the 'apply' command.",
+    type=str,
+)
 # pylint: disable-next=R0913
 def plan(
     path: str | None,
@@ -298,6 +303,7 @@ def plan(
     parallelism: int,
     fail_at_end: bool,
     detailed_exitcode: bool,
+    out: str | None,
 ) -> None:
     """Show changes required by the current configuration."""
     # Find all resources manifests
@@ -322,6 +328,7 @@ def plan(
                 no_color=no_color,
                 parallelism=parallelism,
                 detailed_exitcode=detailed_exitcode,
+                out=out,
             )
         except sh.ErrorReturnCode as err:
             errors = True
