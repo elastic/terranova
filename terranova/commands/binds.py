@@ -321,7 +321,8 @@ def plan(
         terraform = mount_context(full_path, import_vars=True)
 
         # Generate unique out path
-        unique_out_path = os.path.join(full_path, out)
+        if not out is None:
+            unique_out_path = os.path.join(full_path, out)
 
         # Execute plan command
         try:
