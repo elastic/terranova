@@ -39,19 +39,19 @@ dataclasses-json = "^0.6.7" # MIT
 envyaml = "^1.10.211231"    # MIT
 jinja2 = "^3.1.4"           # BSD
 jsonschema = "^4.23.0"      # MIT
-mdformat = "^0.7.17"        # MIT
+mdformat = "^0.7.18"        # MIT
 overrides = "^7.7.0"        # Apache-2.0
-rich = "^13.8.1"            # MIT
-sh = "^2.0.7"               # MIT
+rich = "^13.9.2"            # MIT
+sh = "^2.1.0"               # MIT
 
 [tool.poetry.group.build.dependencies]
-pyinstaller = "^6.10.0"     # GPL-2.0: https://pyinstaller.org/en/stable/license.html
+pyinstaller = "^6.11.0"     # GPL-2.0: https://pyinstaller.org/en/stable/license.html
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.8.0"           # MIT
+black = "^24.10.0"           # MIT
 isort = "^5.13.2"           # MIT
 licenseheaders = "^0.8.8"   # MIT
-pylint = "^3.2.7"           # GPL-2.0: https://github.com/pylint-dev/pylint/blob/main/LICENSE
+pylint = "^3.3.1"           # GPL-2.0: https://github.com/pylint-dev/pylint/blob/main/LICENSE
 pytest = "^8.3.3"           # MIT
 pytest-timeout = "^2.3.1"   # MIT
 pytest-xdist = "^3.6.1"     # MIT
