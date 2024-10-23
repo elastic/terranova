@@ -16,16 +16,19 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+import json
 import os
 import shutil
+from base64 import b64decode, b64encode
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 
 import click
 import mdformat
-import sh
 from click.exceptions import Exit
 from jinja2 import Environment, PackageLoader
 from rich.table import Table
+from sh import ErrorReturnCode
 
 from terranova.commands.helpers import (
     Selector,
@@ -129,7 +132,7 @@ def init(
                 reconfigure=reconfigure,
                 upgrade=upgrade,
             )
-        except sh.ErrorReturnCode:
+        except ErrorReturnCode:
             errors = True
             if not fail_at_end:
                 break
@@ -176,7 +179,7 @@ def fmt(path: str) -> None:
         # Format resources files
         try:
             terraform.fmt()
-        except sh.ErrorReturnCode as err:
+        except ErrorReturnCode as err:
             raise Exit(code=err.exit_code) from err
 
 
@@ -289,6 +292,12 @@ def docs(docs_dir: Path) -> None:
     """,
     is_flag=True,
 )
+@click.option(
+    "--out",
+    help="Write a plan file to the given path",
+    type=click.Path(path_type=Path, dir_okay=False, writable=True),
+    required=False,
+)
 # pylint: disable-next=R0913
 def plan(
     path: str | None,
@@ -298,6 +307,7 @@ def plan(
     parallelism: int,
     fail_at_end: bool,
     detailed_exitcode: bool,
+    out: Path | None,
 ) -> None:
     """Show changes required by the current configuration."""
     # Find all resources manifests
@@ -307,7 +317,10 @@ def plan(
     errors = False
     error_exit_codes = []
 
-    # Format all paths
+    # Execution plan
+    execution_plan = {}
+
+    # Generate all plans
     for full_path, rel_path in paths:
         Log.action(f"Generating plan: {rel_path}")
 
@@ -316,14 +329,23 @@ def plan(
 
         # Execute plan command
         try:
-            terraform.plan(
-                compact_warnings=compact_warnings,
-                input=input,
-                no_color=no_color,
-                parallelism=parallelism,
-                detailed_exitcode=detailed_exitcode,
-            )
-        except sh.ErrorReturnCode as err:
+            args = {
+                "compact_warnings": compact_warnings,
+                "input": input,
+                "no_color": no_color,
+                "parallelism": parallelism,
+                "detailed_exitcode": detailed_exitcode,
+            }
+
+            if out:
+                with NamedTemporaryFile(prefix="terranova-") as file_descriptor:
+                    path = Path(file_descriptor.name)
+                    args["out"] = path
+                    terraform.plan(**args)
+                    execution_plan[rel_path] = b64encode(path.read_bytes()).decode(Constants.ENCODING_UTF_8)
+            else:
+                terraform.plan(**args)
+        except ErrorReturnCode as err:
             errors = True
             error_exit_codes.append(err.exit_code)
             if not fail_at_end:
@@ -338,9 +360,13 @@ def plan(
         exit_code = 1 if 1 in error_exit_codes else 2
         raise Exit(code=exit_code)
 
+    # Generate terranova plan
+    if out:
+        out.write_text(json.dumps(execution_plan))
+
 
 @click.command("apply")
-@click.argument("path", type=str, required=False)
+@click.argument("path_or_plan", type=str, required=False)
 @click.option("--auto-approve", help="Skip interactive approval of plan before applying.", is_flag=True)
 @click.option("--target", help="Apply changes for specific target.", type=str)
 @click.option(
@@ -349,15 +375,24 @@ def plan(
     default=False,
     is_flag=True,
 )
-def apply(path: str | None, auto_approve: bool, target: str, fail_at_end: bool) -> None:
+def apply(path_or_plan: str | None, auto_approve: bool, target: str, fail_at_end: bool) -> None:
     """Create or update resources."""
-    # Find all resources manifests
-    paths = resource_dirs(path)
+    # Check if there is a plan to apply
+    if path_or_plan.endswith(".tnplan"):
+        execution_plan = json.loads(Path(path_or_plan).read_text(Constants.ENCODING_UTF_8))
+        paths = []
+        for rel_path in execution_plan.keys():
+            paths.append((SharedContext.resources_dir().joinpath(rel_path), rel_path))
+    else:
+        execution_plan = None
+
+        # Find all resources manifests
+        paths = resource_dirs(path_or_plan)
 
     # Store errors if fail_at_end
     errors = False
 
-    # Format all paths
+    # Apply each independent plan
     for full_path, rel_path in paths:
         Log.action(f"Applying plan: {rel_path}")
 
@@ -366,8 +401,14 @@ def apply(path: str | None, auto_approve: bool, target: str, fail_at_end: bool) 
 
         # Execute apply command
         try:
-            terraform.apply(auto_approve, target)
-        except sh.ErrorReturnCode:
+            if execution_plan:
+                with NamedTemporaryFile(prefix="terranova-") as file_descriptor:
+                    path = Path(file_descriptor.name)
+                    path.write_bytes(b64decode(execution_plan[rel_path]))
+                    terraform.apply(plan=file_descriptor.name, auto_approve=auto_approve, target=target)
+            else:
+                terraform.apply(auto_approve=auto_approve, target=target)
+        except ErrorReturnCode:
             errors = True
             if not fail_at_end:
                 break
@@ -394,7 +435,7 @@ def destroy(path: str | None) -> None:
         # Execute destroy command
         try:
             terraform.destroy()
-        except sh.ErrorReturnCode as err:
+        except ErrorReturnCode as err:
             raise Exit(code=err.exit_code) from err
 
 
@@ -411,7 +452,7 @@ def graph(path: str) -> None:
     # Execute destroy command
     try:
         terraform.graph()
-    except sh.ErrorReturnCode as err:
+    except ErrorReturnCode as err:
         raise Exit(code=err.exit_code) from err
 
 
@@ -429,7 +470,7 @@ def taint(path: str, address: str) -> None:
     # Execute taint command
     try:
         terraform.taint(address)
-    except sh.ErrorReturnCode as err:
+    except ErrorReturnCode as err:
         raise Exit(code=err.exit_code) from err
 
 
@@ -447,7 +488,7 @@ def untaint(path: str, address: str) -> None:
     # Execute untaint command
     try:
         terraform.untaint(address)
-    except sh.ErrorReturnCode as err:
+    except ErrorReturnCode as err:
         raise Exit(code=err.exit_code) from err
 
 
@@ -466,7 +507,7 @@ def define(path: str, address: str, identifier: str) -> None:
     # Execute import command
     try:
         terraform.define(address, identifier)
-    except sh.ErrorReturnCode as err:
+    except ErrorReturnCode as err:
         raise Exit(code=err.exit_code) from err
 
 
@@ -502,7 +543,7 @@ def runbook(path: str, name: str) -> None:
         executable_runbook.exec(path, full_path / "runbooks")
     except MissingRunbookEnvError as err:
         Log.fatal("find environment variable", err)
-    except sh.ErrorReturnCode as err:
+    except ErrorReturnCode as err:
         raise Exit(code=err.exit_code) from err
 
 
