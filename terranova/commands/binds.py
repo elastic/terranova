@@ -378,7 +378,7 @@ def plan(
 def apply(path_or_plan: str | None, auto_approve: bool, target: str, fail_at_end: bool) -> None:
     """Create or update resources."""
     # Check if there is a plan to apply
-    if path_or_plan.endswith(".tnplan"):
+    if path_or_plan.endswith("tnplan"):
         execution_plan = json.loads(Path(path_or_plan).read_text(Constants.ENCODING_UTF_8))
         paths = []
         for rel_path in execution_plan.keys():
