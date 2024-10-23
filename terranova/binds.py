@@ -18,7 +18,9 @@
 #
 import os
 import sys
+from contextlib import contextmanager
 from pathlib import Path
+from typing import ContextManager
 
 from overrides import override
 from sh import Command, CommandNotFound, ErrorReturnCode, RunningCommand
@@ -33,20 +35,50 @@ class Bind:
 
     def __init__(self, cmd: Command) -> None:
         """Init bind."""
-        self.__cmd = cmd
+        self._cmd = cmd
 
-    def _exec(self, *args, **kwargs) -> RunningCommand:
-        """Run the command and handle lifecycle in case we kill the parent process."""
+    def binary_path(self) -> Path:
+        """
+        Returns:
+            path where binary is installed.
+        """
+        # pylint: disable=protected-access
+        return Path(self._cmd._path)
+
+    @contextmanager
+    def _exec_ctx(self, *args, **kwargs) -> ContextManager[RunningCommand]:
+        """
+        Run the command and handle lifecycle in case we kill the parent process.
+        Note: It's useful for composite action that need multiple calls.
+
+        Returns:
+            process execution context.
+        """
         process: RunningCommand | None = None
         try:
-            kwargs = {**kwargs, **{"_bg": True, "_bg_exc": False}}
-            running_process = self.__cmd(*args, **kwargs)
+            kwargs = {
+                **kwargs,
+                **{"_bg": True, "_bg_exc": False, "_truncate_exc": False},
+            }
+            running_process = self._cmd(*args, **kwargs)
             if isinstance(running_process, RunningCommand):
-                return running_process.wait()
-            raise ValueError
+                yield running_process
+            else:
+                raise ValueError("Not a running command")
         finally:
-            if process is not None and process.is_alive():
-                process.kill()
+            if process is not None:
+                if process.is_alive():
+                    process.kill()
+
+    def _exec(self, *args, **kwargs) -> RunningCommand:
+        """
+        Run the command and handle lifecycle in case we kill the parent process.
+
+        Returns:
+            process execution result.
+        """
+        with self._exec_ctx(*args, **kwargs) as process:
+            return process.wait()
 
 
 class Terraform(Bind):
@@ -68,7 +100,7 @@ class Terraform(Bind):
         self.__variables = variables
 
     @override
-    def _exec(self, *args, **kwargs) -> RunningCommand:
+    def _exec_ctx(self, *args, **kwargs) -> ContextManager[RunningCommand]:
         # Predicate for allowed env vars
         def is_allowed_env_var(env_var: str) -> bool:
             return (
@@ -104,7 +136,7 @@ class Terraform(Bind):
             kwargs["_out"] = sys.stdout
             kwargs["_err"] = sys.stderr
         kwargs["_cwd"] = self.__work_dir
-        return super()._exec(*args, **kwargs)
+        return super()._exec_ctx(*args, **kwargs)
 
     # pylint: disable=too-many-arguments
     def init(
@@ -151,7 +183,13 @@ class Terraform(Bind):
 
     # pylint: disable=redefined-builtin
     def plan(
-        self, compact_warnings: bool, input: bool, no_color: bool, parallelism: int, detailed_exitcode: bool
+        self,
+        compact_warnings: bool,
+        input: bool,
+        no_color: bool,
+        parallelism: int | None,
+        detailed_exitcode: bool,
+        out: Path | None = None,
     ) -> None:
         """Show changes required by the current configuration."""
         args = ["plan"]
@@ -164,11 +202,15 @@ class Terraform(Bind):
             args.append(f"-parallelism={parallelism}")
         if detailed_exitcode:
             args.append("-detailed-exitcode")
+        if out:
+            args.append(f"-out={out.as_posix()}")
         self._exec(*args, _inherit=True)
 
-    def apply(self, auto_approve: bool = False, target: str | None = None) -> None:
+    def apply(self, plan: str | None = None, auto_approve: bool = False, target: str | None = None) -> None:
         """Create or update infrastructure."""
         args = ["apply"]
+        if plan:
+            args.append(plan)
         if auto_approve:
             args.append("-auto-approve")
         if target:
