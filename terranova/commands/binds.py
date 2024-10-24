@@ -63,7 +63,7 @@ from terranova.utils import Constants, Log, SharedContext
     default=False,
     is_flag=True,
 )
-# pylint: disable-next=R0913
+# pylint: disable-next=R0913,too-many-positional-arguments
 def init(
     path: str | None, migrate_state: bool, no_backend: bool, reconfigure: bool, upgrade: bool, fail_at_end: bool
 ) -> None:
@@ -298,7 +298,7 @@ def docs(docs_dir: Path) -> None:
     type=click.Path(path_type=Path, dir_okay=False, writable=True),
     required=False,
 )
-# pylint: disable-next=R0913
+# pylint: disable-next=R0913,too-many-positional-arguments
 def plan(
     path: str | None,
     compact_warnings: bool,
