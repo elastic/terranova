@@ -55,3 +55,4 @@ jobs:
         run: poetry run poe release:pre
         env:
           RELEASE_VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ steps.get-token.outputs.token }}
