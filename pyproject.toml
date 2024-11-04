@@ -12,7 +12,7 @@ typeCheckingMode = "standard"
 
 [tool.poetry]
 name = "terranova"
-version = "0.6.1"
+version = "0.6.2-dev"
 description = "Terranova is a thin wrapper for Terraform that provides extra tools and logic to handle Terraform configurations at scale."
 authors = ["Adrien Mannocci <adrien.mannocci@elastic.co>"]
 license = "Apache-2.0"
