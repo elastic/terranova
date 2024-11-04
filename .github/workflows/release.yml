@@ -106,3 +106,4 @@ jobs:
         run: poetry run poe release:post
         env:
           NEXT_VERSION: ${{ inputs.version }}
+          GH_TOKEN: ${{ steps.get-token.outputs.token }}
