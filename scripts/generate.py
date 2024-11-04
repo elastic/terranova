@@ -22,12 +22,8 @@ from scripts.utils import detect_pyinstaller
 
 
 def run() -> None:
-    args = ["-n", "terranova", "--onefile", "--noconfirm"]
-    exclude_modules = (
-        "setuptools",
-        "setuptools._vendor",
-        "setuptools._vendor.importlib_metadata",
-    )
+    args = ["-n", "terranova", "--onefile", "--noconfirm", "--optimize=2"]
+    exclude_modules = ()
     for exclude_module in exclude_modules:
         args.extend(["--exclude-module", exclude_module])
 
