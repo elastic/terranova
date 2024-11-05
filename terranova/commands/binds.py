@@ -351,6 +351,15 @@ def plan(
             if not fail_at_end:
                 break
 
+    write_plan = lambda: (
+        out.write_text(json.dumps(execution_plan))
+        and Log.action(
+            f"Saved terranova plan to: {out}\n\n"
+            f"To perform exactly these actions with terranova, run the following command to apply:\n"
+            f'    terranova apply "{out}"'
+        )
+    )
+
     # Report any errors if fail_at_end has been enabled
     if errors:
         # The error_exit_codes list contains the numbers 1, 2, or both if detailed-exitcode is enabled.
@@ -358,11 +367,14 @@ def plan(
         # If 1 is present, the plan failed for at least one path, hence we should return 1.
         # If all exit codes are 2, the plan succeeded for all paths, but there are changes, hence we should return 2.
         exit_code = 1 if 1 in error_exit_codes else 2
+        # Exit code 2 is a success, but there are changes. Hence, we should write the plan to the given path.
+        if exit_code == 2 and out:
+            write_plan()
         raise Exit(code=exit_code)
 
     # Generate terranova plan
     if out:
-        out.write_text(json.dumps(execution_plan))
+        write_plan()
 
 
 @click.command("apply")
