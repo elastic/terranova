@@ -94,7 +94,7 @@ def find_all_resource_dirs(resources_dir: Path) -> list[tuple[Path, str]]:
         list of all path.
     """
     paths: list[tuple[Path, str]] = []
-    resources_dir_path = resources_dir.as_posix()
+    resources_dir_path = SharedContext.resources_dir().as_posix()
     resources_dir_prefix_len = len(resources_dir_path) + 1
     for path, _, files in os.walk(resources_dir):
         for file in files:
