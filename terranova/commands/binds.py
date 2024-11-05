@@ -341,16 +341,12 @@ def plan(
                 with NamedTemporaryFile(prefix="terranova-") as file_descriptor:
                     path = Path(file_descriptor.name)
                     args["out"] = path
-
-                    def add_to_execution_plan():
-                        execution_plan[rel_path] = b64encode(path.read_bytes()).decode(Constants.ENCODING_UTF_8)
-
                     try:
                         terraform.plan(**args)
-                        add_to_execution_plan()
+                        execution_plan[rel_path] = b64encode(path.read_bytes()).decode(Constants.ENCODING_UTF_8)
                     except ErrorReturnCode as plan_err:
                         if plan_err.exit_code == 2:
-                            add_to_execution_plan()
+                            execution_plan[rel_path] = b64encode(path.read_bytes()).decode(Constants.ENCODING_UTF_8)
                         raise plan_err
             else:
                 terraform.plan(**args)
