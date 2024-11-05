@@ -351,14 +351,13 @@ def plan(
             if not fail_at_end:
                 break
 
-    write_plan = lambda: (
+    def write_plan():
         out.write_text(json.dumps(execution_plan))
-        and Log.action(
+        Log.action(
             f"Saved terranova plan to: {out}\n\n"
             f"To perform exactly these actions with terranova, run the following command to apply:\n"
             f'    terranova apply "{out}"'
         )
-    )
 
     # Report any errors if fail_at_end has been enabled
     if errors:
