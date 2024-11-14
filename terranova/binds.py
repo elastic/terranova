@@ -20,6 +20,7 @@ import os
 import sys
 from contextlib import contextmanager
 from pathlib import Path
+from time import sleep
 from typing import ContextManager
 
 from overrides import override
@@ -60,13 +61,16 @@ class Bind:
                 **kwargs,
                 **{"_bg": True, "_bg_exc": False, "_truncate_exc": False},
             }
-            running_process = self._cmd(*args, **kwargs)
-            if isinstance(running_process, RunningCommand):
-                yield running_process
+            process = self._cmd(*args, **kwargs)
+            if isinstance(process, RunningCommand):
+                yield process
             else:
                 raise ValueError("Not a running command")
         finally:
             if process is not None:
+                if process.is_alive():
+                    process.terminate()
+                sleep(10)
                 if process.is_alive():
                     process.kill()
 
