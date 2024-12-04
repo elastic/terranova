@@ -1,6 +1,0 @@
-[TYPECHECK]
-generated-members=sh
-max-line-length=900
-
-[MASTER]
-disable=C0114

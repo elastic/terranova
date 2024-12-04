@@ -1,6 +1,5 @@
 # Base image for build
-ARG base_image_version=3.10.12
-FROM python:${base_image_version}-slim-bullseye as builder
+FROM debian:bullseye-slim AS builder
 
 # Switch workdir
 WORKDIR /opt/terranova
@@ -13,13 +12,17 @@ RUN \
   apt-get update > /dev/null \
   && apt-get install -y --no-install-recommends \
     binutils="*" \
+    ca-certificates="*" \
+    curl="*" \
   && apt-get clean
 
-# Install poetry
+# Install uv
+ENV UV_INSTALL_DIR="/opt/uv"
+ENV PATH="${UV_INSTALL_DIR}:${PATH}"
 RUN \
-  pip3 install --no-cache-dir --upgrade pip poetry
+  curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # Build
 RUN \
-  poetry install \
-  && poetry run pyinstaller terranova.spec
+  uv sync \
+  && uv run pyinstaller terranova.spec
