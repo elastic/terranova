@@ -20,11 +20,16 @@ import os
 import sys
 from contextlib import contextmanager
 from pathlib import Path
-from time import sleep
 from typing import ContextManager
 
 from overrides import override
-from sh import Command, CommandNotFound, ErrorReturnCode, RunningCommand
+from sh import (
+    Command,
+    CommandNotFound,
+    ErrorReturnCode,
+    RunningCommand,
+    TimeoutException,
+)
 
 from .exceptions import InvalidResourcesError
 from .utils import Constants, Log, SharedContext
@@ -67,11 +72,11 @@ class Bind:
             else:
                 raise ValueError("Not a running command")
         finally:
-            if process is not None:
-                if process.is_alive():
-                    process.terminate()
-                sleep(10)
-                if process.is_alive():
+            if process is not None and process.is_alive():
+                process.terminate()
+                try:
+                    process.wait(timeout=10)
+                except TimeoutException:
                     process.kill()
 
     def _exec(self, *args, **kwargs) -> RunningCommand:
@@ -96,7 +101,9 @@ class Terraform(Bind):
             Log.fatal("detect terraform binary", err)
 
         try:
-            SharedContext.terraform_shared_plugin_cache_dir().mkdir(parents=True, exist_ok=True)
+            SharedContext.terraform_shared_plugin_cache_dir().mkdir(
+                parents=True, exist_ok=True
+            )
         except OSError as err:
             Log.fatal("create terraform cache directory", err)
 
@@ -118,7 +125,9 @@ class Terraform(Bind):
             )
 
         # Copy allowed env vars
-        env = {key: value for key, value in os.environ.items() if is_allowed_env_var(key)}
+        env = {
+            key: value for key, value in os.environ.items() if is_allowed_env_var(key)
+        }
 
         # Bind variables
         if self.__variables:
@@ -126,7 +135,9 @@ class Terraform(Bind):
                 env[f"TF_VAR_{key}"] = value
 
         # Bind plugin cache dir
-        env["TF_PLUGIN_CACHE_DIR"] = SharedContext.terraform_shared_plugin_cache_dir().absolute().as_posix()
+        env["TF_PLUGIN_CACHE_DIR"] = (
+            SharedContext.terraform_shared_plugin_cache_dir().absolute().as_posix()
+        )
 
         # Enable debug
         if SharedContext.is_verbose_enabled():
@@ -210,7 +221,12 @@ class Terraform(Bind):
             args.append(f"-out={out.as_posix()}")
         self._exec(*args, _inherit=True)
 
-    def apply(self, plan: str | None = None, auto_approve: bool = False, target: str | None = None) -> None:
+    def apply(
+        self,
+        plan: str | None = None,
+        auto_approve: bool = False,
+        target: str | None = None,
+    ) -> None:
         """Create or update infrastructure."""
         args = ["apply"]
         if plan:
