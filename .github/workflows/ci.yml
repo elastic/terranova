@@ -28,7 +28,7 @@ jobs:
         uses: ./.github/workflows/env-install
 
       - name: Lint
-        run: poetry run poe lint
+        run: uv run poe lint
 
   build:
     needs:
@@ -45,11 +45,9 @@ jobs:
 
       - name: Install environment
         uses: ./.github/workflows/env-install
-        with:
-          only: 'main,build'
 
       - name: Build
-        run: poetry run poe build
+        run: uv run poe build
 
   test:
     needs:
@@ -67,4 +65,4 @@ jobs:
           terraform_wrapper: false
 
       - name: Test
-        run: poetry run poe test
+        run: uv run poe test

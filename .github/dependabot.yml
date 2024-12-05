@@ -5,17 +5,6 @@
 
 version: 2
 updates:
-  - package-ecosystem: "pip"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-      day: "sunday"
-      time: "22:00"
-    groups:
-      pip:
-        patterns:
-          - "*"
-
   # Maintain dependencies for GitHub Actions (/.github/workflows)
   - package-ecosystem: "github-actions"
     directory: "/"

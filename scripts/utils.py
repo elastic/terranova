@@ -17,6 +17,7 @@
 # under the License.
 #
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Final, NoReturn
@@ -43,17 +44,17 @@ def fatal(msg: str, err: Exception | None = None) -> NoReturn:
     sys.exit(1)
 
 
-def detect_poetry() -> Command:
+def detect_uv() -> Command:
     """
-    Try to detect poetry.
+    Try to detect uv.
 
     Returns:
-        a command if poetry is detected.
+        a command if uv is detected.
     """
     try:
-        return Command("poetry")
+        return Command("uv")
     except CommandNotFound:
-        fatal("`poetry` isn't detected")
+        fatal("`uv` isn't detected")
 
 
 def detect_git() -> Command:
@@ -80,16 +81,16 @@ def detect_gh() -> Command:
         fatal("`gh` isn't installed")
 
 
-def detect_pylint() -> Command:
+def detect_ruff() -> Command:
     """
-    Try to detect pylint.
+    Try to detect ruff.
     Returns:
-        a command if pylint is detected.
+        a command if ruff is detected.
     """
     try:
-        return Command("pylint")
+        return Command("ruff")
     except CommandNotFound:
-        fatal("`pylint` isn't installed")
+        fatal("`ruff` isn't installed")
 
 
 def detect_pyinstaller() -> Command:
@@ -121,9 +122,10 @@ def project_version() -> str:
     Returns:
         current project version.
     """
-    poetry = detect_poetry()
-    version = poetry("version", "-s", _err=sys.stderr)
-    return version.strip()
+    uv = detect_uv()
+    details = uv("pip", "show", "terranova", _err=sys.stderr)
+    version = re.search(r"Version: (.*)", details).group(1)
+    return version.replace(".dev0", "-dev").strip()
 
 
 def container_backend() -> tuple[Command, dict[str, str]]:

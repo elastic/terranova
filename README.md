@@ -25,9 +25,7 @@
 ## :package: Prerequisites
 
 - [Python 3.11+](https://docs.python.org/3/) for development.
-- [Poetry](https://python-poetry.org/) for build system.
-- [Poe](https://poethepoet.natn.io/installation.html#install-poe-the-poet-as-a-poetry-plugin) for task runner.
-- [Up](https://github.com/MousaZeidBaker/poetry-plugin-up) for dependency updates.
+- [uv](https://docs.astral.sh/uv/) for build system.
 - [Podman](https://podman.io/docs) for container packaging.
 - [pre-commit](https://pre-commit.com/) for git management.
 
@@ -56,15 +54,10 @@ The following steps will ensure your project is cloned properly.
    git clone https://github.com/elastic/terranova
    cd terranova
    ```
-2. Use version defined in .python-version:
+2. Install dependencies and setup environment:
    ```shell
-   pyenv install
-   ```
-3. Install dependencies and setup environment:
-   ```shell
-   poetry install
-   poetry shell
-   poetry poe env:configure
+   uv sync
+   uv run poe env:configure
    ```
 
 ### Lint
@@ -72,7 +65,7 @@ The following steps will ensure your project is cloned properly.
 - To lint you have to use the workflow.
 
 ```bash
-poetry poe lint
+uv run poe lint
 ```
 
 - It will lint the project code using `pylint`.
@@ -82,7 +75,7 @@ poetry poe lint
 - To format you have to use the workflow.
 
 ```bash
-poetry poe fmt
+uv run poe fmt
 ```
 
 - It will format the project code using `black` and `isort`.
@@ -103,16 +96,16 @@ brew install terranova
 
 ```bash
 # For MacOSX Apple Silicon
-gh release download 0.4.0 -p '*-darwin-arm64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
+gh release download 0.6.5 -p '*-darwin-arm64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
 
 # For MacOSX Intel
-gh release download 0.4.0 -p '*-darwin-amd64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
+gh release download 0.6.5 -p '*-darwin-amd64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
 
 # For Linux arm64
-gh release download 0.4.0 -p '*-linux-arm64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
+gh release download 0.6.5 -p '*-linux-arm64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
 
 # For Linux amd64
-gh release download 0.4.0 -p '*-linux-amd64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
+gh release download 0.6.5 -p '*-linux-amd64' -O /usr/local/bin/terranova --clobber --repo elastic/terranova
 
 # Make it executable
 chmod +x /usr/local/bin/terranova
