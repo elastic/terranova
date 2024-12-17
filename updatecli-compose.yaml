@@ -1,0 +1,8 @@
+# Config file for `updatecli compose ...`.
+# https://www.updatecli.io/docs/core/compose/
+policies:
+  - name: Local Updatecli Policies
+    config:
+      - .github/updatecli.yml
+    values:
+      - .github/values.d/scm.yml

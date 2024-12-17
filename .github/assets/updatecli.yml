@@ -1,0 +1,47 @@
+name: Update uv lock dependencies
+
+conditions:
+  checkUvLock:
+    name: Check uv lock is outdated
+    kind: shell
+    spec:
+      changedif:
+        kind: exitcode
+        spec:
+          warning: 2
+          success: 2
+          failure: 0
+      command: uv lock -U --check
+      environments:
+        - name: PATH
+
+targets:
+  updateUvLock:
+    name: Update uv lock file
+    kind: shell
+    spec:
+      command: uv lock -U
+      environments:
+        - name: PATH
+
+scms:
+    default:
+        kind: github
+        spec:
+            owner: '{{ .scm.owner }}'
+            repository: '{{ .scm.repository }}'
+            branch: '{{ .scm.branch }}'
+            username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+            token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+            commitusingapi: true
+        disabled: false
+
+actions:
+    default:
+        title: "build: update all dependencies"
+        kind: github/pullrequest
+        spec:
+            automerge: true
+            mergemethod: squash
+            usetitleforautomerge: true
+        scmid: default
