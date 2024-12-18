@@ -25,23 +25,23 @@ targets:
         - name: PATH
 
 scms:
-    default:
-        kind: github
-        spec:
-            owner: '{{ .scm.owner }}'
-            repository: '{{ .scm.repository }}'
-            branch: '{{ .scm.branch }}'
-            username: '{{ requiredEnv "GITHUB_ACTOR" }}'
-            token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-            commitusingapi: true
-        disabled: false
+  default:
+    kind: github
+    spec:
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      branch: '{{ .scm.branch }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      commitusingapi: true
+    disabled: false
 
 actions:
-    default:
-        title: "build: update all dependencies"
-        kind: github/pullrequest
-        spec:
-            automerge: true
-            mergemethod: squash
-            usetitleforautomerge: true
-        scmid: default
+  default:
+    title: "build: update all dependencies"
+    kind: github/pullrequest
+    spec:
+      automerge: true
+      mergemethod: squash
+      usetitleforautomerge: true
+    scmid: default
