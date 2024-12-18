@@ -3,6 +3,6 @@
 policies:
   - name: Local Updatecli Policies
     config:
-      - .github/updatecli.yml
+      - .github/updatecli/updatecli.d/updatecli.yml
     values:
-      - .github/values.d/scm.yml
+      - .github/updatecli/values.d/scm.yml
