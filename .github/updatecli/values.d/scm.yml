@@ -3,8 +3,3 @@ scm:
   owner: elastic
   repository: terranova
   branch: main
-  commitusingapi: true
-  # begin update-compose policy values
-  user: obltmachine
-  email: obltmachine@users.noreply.github.com
-  # end update-compose policy values
