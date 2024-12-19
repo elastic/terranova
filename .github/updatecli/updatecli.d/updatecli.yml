@@ -19,7 +19,13 @@ targets:
   updateUvLock:
     name: Update uv lock file
     kind: shell
+    scmid: default
     spec:
+      changedif:
+        kind: file/checksum
+        spec:
+          files:
+            - uv.lock
       command: uv lock -U
       environments:
         - name: PATH
