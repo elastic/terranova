@@ -29,7 +29,6 @@ from .exceptions import ExplainedError
 class Constants:
     """All constants"""
 
-    # pylint: disable=R0903
     CTX_CONF_DIR: Final[str] = "ctx_conf_dir"
     CTX_CONSOLE: Final[str] = "ctx_console"
     CTX_DEBUG: Final[str] = "ctx_debug"
@@ -149,7 +148,9 @@ class Log:
                 err_console.print(f"  Details: {err}")
 
     @classmethod
-    def fatal(cls, msgs: str | list[str], err: Exception | None = None, raise_exit: int = 1) -> NoReturn:
+    def fatal(
+        cls, msgs: str | list[str], err: Exception | None = None, raise_exit: int = 1
+    ) -> NoReturn:
         """Log a failure and exit."""
         Log.failure(msgs, err)
         raise Exit(code=raise_exit)

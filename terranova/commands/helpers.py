@@ -36,9 +36,10 @@ class SelectorType(click.ParamType):
 
     name = "selector"
 
-    # pylint: disable=R1710
     @override
-    def convert(self, value, param: Parameter | None, ctx: click.Context | None) -> Selector:
+    def convert(
+        self, value, param: Parameter | None, ctx: click.Context | None
+    ) -> Selector:
         if not isinstance(value, str):
             self.fail(f"{value!r} isn't a valid selector", param, ctx)
 
@@ -46,7 +47,6 @@ class SelectorType(click.ParamType):
         return Selector(name=data[0], value=None if len(data) == 1 else data[1])
 
 
-# pylint: disable=R1710
 def read_manifest(path: Path) -> "ResourcesManifest":
     """
     Read the resources manifest if possible.
@@ -64,8 +64,9 @@ def read_manifest(path: Path) -> "ResourcesManifest":
         Log.fatal("read manifest", err)
 
 
-# pylint: disable=R1710
-def discover_resources(path: Path, selectors: list[Selector] | None = None) -> list[Resource]:
+def discover_resources(
+    path: Path, selectors: list[Selector] | None = None
+) -> list[Resource]:
     """
     Discover resources in every terraform configuration files.
     This function handle errors by logging and exiting.
@@ -119,7 +120,11 @@ def resource_dirs(path: str | None) -> list[tuple[Path, str]]:
     return find_all_resource_dirs(resources_dir)
 
 
-def mount_context(full_path: Path, manifest: ResourcesManifest | None = None, import_vars: bool = False) -> Terraform:
+def mount_context(
+    full_path: Path,
+    manifest: ResourcesManifest | None = None,
+    import_vars: bool = False,
+) -> Terraform:
     """Mount the terraform context by importing variables if needed."""
     # Ensure manifest exists and can be read
     if not manifest:
