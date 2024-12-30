@@ -48,26 +48,40 @@ from terranova.exceptions import (
 from terranova.utils import Constants, Log, SharedContext
 
 
-# pylint: disable=R0914
 @click.command("init")
 @click.argument("path", type=str, required=False)
-@click.option("--migrate-state", help="Reconfigure a backend, and attempt to migrate any existing state.", is_flag=True)
 @click.option(
-    "--no-backend", help="Disable backend for this configuration and use what was previously instead.", is_flag=True
+    "--migrate-state",
+    help="Reconfigure a backend, and attempt to migrate any existing state.",
+    is_flag=True,
 )
-@click.option("--reconfigure", help="Reconfigure a backend, ignoring any saved configuration.", is_flag=True)
-@click.option("--upgrade", help="Install the latest module and provider versions.", is_flag=True)
+@click.option(
+    "--no-backend",
+    help="Disable backend for this configuration and use what was previously instead.",
+    is_flag=True,
+)
+@click.option(
+    "--reconfigure",
+    help="Reconfigure a backend, ignoring any saved configuration.",
+    is_flag=True,
+)
+@click.option(
+    "--upgrade", help="Install the latest module and provider versions.", is_flag=True
+)
 @click.option(
     "--fail-at-end",
     help="If specified, only fail afterwards; allow all non-impacted projects to continue.",
     default=False,
     is_flag=True,
 )
-# pylint: disable-next=R0913,too-many-positional-arguments
 def init(
-    path: str | None, migrate_state: bool, no_backend: bool, reconfigure: bool, upgrade: bool, fail_at_end: bool
+    path: str | None,
+    migrate_state: bool,
+    no_backend: bool,
+    reconfigure: bool,
+    upgrade: bool,
+    fail_at_end: bool,
 ) -> None:
-    # pylint: disable=R0912
     """Init resources manifest."""
     # Find all resources manifests
     paths = resource_dirs(path)
@@ -100,7 +114,9 @@ def init(
                         target_dirname = os.path.dirname(dependency.target)
                         os.symlink(
                             os.path.relpath(
-                                SharedContext.shared_dir().joinpath(dependency.source).as_posix(),
+                                SharedContext.shared_dir()
+                                .joinpath(dependency.source)
+                                .as_posix(),
                                 full_path.joinpath(target_dirname).as_posix(),
                             ),
                             dependency.target,
@@ -126,7 +142,9 @@ def init(
             # Mount terraform context
             terraform = mount_context(full_path, manifest)
             terraform.init(
-                backend_config={"key": os.path.relpath(full_path, SharedContext.resources_dir())},
+                backend_config={
+                    "key": os.path.relpath(full_path, SharedContext.resources_dir())
+                },
                 migrate_state=migrate_state,
                 no_backend=no_backend,
                 reconfigure=reconfigure,
@@ -144,7 +162,9 @@ def init(
 
 @click.command("get")
 @click.argument("path", type=str, required=False)
-@click.option("--selector", "selectors", type=SelectorType(), required=False, multiple=True)
+@click.option(
+    "--selector", "selectors", type=SelectorType(), required=False, multiple=True
+)
 def get(path: str | None, selectors: list[Selector] | None) -> None:
     """Display one or many resources."""
     # Find all resources manifests
@@ -221,7 +241,9 @@ def validate(path: str | None, fail_at_end: bool) -> None:
 
     # Report any errors if fail_at_end has been enabled
     if errors:
-        Log.fatal("The syntax is probably incorrect in one of the projects. See above for errors.")
+        Log.fatal(
+            "The syntax is probably incorrect in one of the projects. See above for errors."
+        )
 
 
 @click.command("docs")
@@ -240,7 +262,14 @@ def docs(docs_dir: Path) -> None:
         for file in files:
             if os.path.basename(file) == Constants.MANIFEST_FILE_NAME:
                 jobs.append(
-                    (Path(path), docs_dir.joinpath(os.path.relpath(path, SharedContext.resources_dir().as_posix())))
+                    (
+                        Path(path),
+                        docs_dir.joinpath(
+                            os.path.relpath(
+                                path, SharedContext.resources_dir().as_posix()
+                            )
+                        ),
+                    )
                 )
 
     # Clean docs dir
@@ -260,10 +289,11 @@ def docs(docs_dir: Path) -> None:
         # Write documentation file
         rendering = tmpl.render({"manifest": manifest, "resources": resources})
         formatted = mdformat.text(rendering)
-        target_path.with_suffix(".md").write_text(data=formatted, encoding=Constants.ENCODING_UTF_8)
+        target_path.with_suffix(".md").write_text(
+            data=formatted, encoding=Constants.ENCODING_UTF_8
+        )
 
 
-# pylint: disable=redefined-builtin
 @click.command("plan")
 @click.argument("path", type=str, required=False)
 @click.option(
@@ -271,9 +301,20 @@ def docs(docs_dir: Path) -> None:
     help="If Terraform produces any warnings that are not by errors, show them in a more compact that includes only the summary messages.",
     is_flag=True,
 )
-@click.option("--input/--no-input", help="Ask for input for variables if not directly set.", default=True)
-@click.option("--no-color", help="If specified, output won't contain any color.", is_flag=True)
-@click.option("--parallelism", help="Limit the number of parallel resource operations.", type=int, default=10)
+@click.option(
+    "--input/--no-input",
+    help="Ask for input for variables if not directly set.",
+    default=True,
+)
+@click.option(
+    "--no-color", help="If specified, output won't contain any color.", is_flag=True
+)
+@click.option(
+    "--parallelism",
+    help="Limit the number of parallel resource operations.",
+    type=int,
+    default=10,
+)
 @click.option(
     "--fail-at-end",
     help="If specified, only fail afterwards; allow all non-impacted projects to continue.",
@@ -298,7 +339,6 @@ def docs(docs_dir: Path) -> None:
     type=click.Path(path_type=Path, dir_okay=False, writable=True),
     required=False,
 )
-# pylint: disable-next=R0913,too-many-positional-arguments
 def plan(
     path: str | None,
     compact_warnings: bool,
@@ -343,10 +383,14 @@ def plan(
                     args["out"] = path
                     try:
                         terraform.plan(**args)
-                        execution_plan[rel_path] = b64encode(path.read_bytes()).decode(Constants.ENCODING_UTF_8)
+                        execution_plan[rel_path] = b64encode(path.read_bytes()).decode(
+                            Constants.ENCODING_UTF_8
+                        )
                     except ErrorReturnCode as plan_err:
                         if plan_err.exit_code == 2:
-                            execution_plan[rel_path] = b64encode(path.read_bytes()).decode(Constants.ENCODING_UTF_8)
+                            execution_plan[rel_path] = b64encode(
+                                path.read_bytes()
+                            ).decode(Constants.ENCODING_UTF_8)
                         raise plan_err
             else:
                 terraform.plan(**args)
@@ -383,7 +427,11 @@ def plan(
 
 @click.command("apply")
 @click.argument("path_or_plan", type=str, required=False)
-@click.option("--auto-approve", help="Skip interactive approval of plan before applying.", is_flag=True)
+@click.option(
+    "--auto-approve",
+    help="Skip interactive approval of plan before applying.",
+    is_flag=True,
+)
 @click.option("--target", help="Apply changes for specific target.", type=str)
 @click.option(
     "--fail-at-end",
@@ -391,11 +439,15 @@ def plan(
     default=False,
     is_flag=True,
 )
-def apply(path_or_plan: str | None, auto_approve: bool, target: str, fail_at_end: bool) -> None:
+def apply(
+    path_or_plan: str | None, auto_approve: bool, target: str, fail_at_end: bool
+) -> None:
     """Create or update resources."""
     # Check if there is a plan to apply
     if path_or_plan.endswith("tnplan"):
-        execution_plan = json.loads(Path(path_or_plan).read_text(Constants.ENCODING_UTF_8))
+        execution_plan = json.loads(
+            Path(path_or_plan).read_text(Constants.ENCODING_UTF_8)
+        )
         paths = []
         for rel_path in execution_plan.keys():
             paths.append((SharedContext.resources_dir().joinpath(rel_path), rel_path))
@@ -421,7 +473,11 @@ def apply(path_or_plan: str | None, auto_approve: bool, target: str, fail_at_end
                 with NamedTemporaryFile(prefix="terranova-") as file_descriptor:
                     path = Path(file_descriptor.name)
                     path.write_bytes(b64decode(execution_plan[rel_path]))
-                    terraform.apply(plan=file_descriptor.name, auto_approve=auto_approve, target=target)
+                    terraform.apply(
+                        plan=file_descriptor.name,
+                        auto_approve=auto_approve,
+                        target=target,
+                    )
             else:
                 terraform.apply(auto_approve=auto_approve, target=target)
         except ErrorReturnCode:
@@ -547,7 +603,9 @@ def runbook(path: str, name: str) -> None:
     manifest = read_manifest(full_path)
 
     # Extract runbook
-    matching_runbooks = [rb for rb in manifest.runbooks if rb.name == name] if manifest.runbooks else []
+    matching_runbooks = (
+        [rb for rb in manifest.runbooks if rb.name == name] if manifest.runbooks else []
+    )
     if not matching_runbooks:
         Log.fatal("execute runbook", MissingRunbookError(name))
     if len(matching_runbooks) > 1:

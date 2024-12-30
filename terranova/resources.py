@@ -112,7 +112,14 @@ class ResourcesRunbook:
         if self.workdir:
             workdir = workdir.joinpath(self.workdir)
         entrypoint = Command(self.entrypoint)
-        entrypoint(self.args, _env=env, _cwd=workdir, _in=sys.stdin, _out=sys.stdout, _err=sys.stderr)
+        entrypoint(
+            self.args,
+            _env=env,
+            _cwd=workdir,
+            _in=sys.stdin,
+            _out=sys.stdout,
+            _err=sys.stderr,
+        )
 
 
 @dataclass_json
@@ -153,7 +160,9 @@ class ResourcesManifest:
         if not os.access(path.as_posix(), os.R_OK):
             raise UnreadableManifestError(path)
 
-        with path.open(Constants.FILE_MODE_READ, encoding=Constants.ENCODING_UTF_8) as file_descriptor:
+        with path.open(
+            Constants.FILE_MODE_READ, encoding=Constants.ENCODING_UTF_8
+        ) as file_descriptor:
             try:
                 data = yaml.safe_load(file_descriptor)
             except yaml.YAMLError as err:
@@ -164,9 +173,13 @@ class ResourcesManifest:
 
             # Get configuration schema
             try:
-                schema = pkgutil.get_data(__name__, f"schemas/manifest_schema_v{version}.json")
+                schema = pkgutil.get_data(
+                    __name__, f"schemas/manifest_schema_v{version}.json"
+                )
                 if not schema:
-                    raise FileNotFoundError(f"The schema `schemas/manifest_schema_v{version}.json` can't be found")
+                    raise FileNotFoundError(
+                        f"The schema `schemas/manifest_schema_v{version}.json` can't be found"
+                    )
             except FileNotFoundError as err:
                 raise VersionManifestError(version) from err
             schema = json.loads(schema)
@@ -177,7 +190,6 @@ class ResourcesManifest:
             except ValidationError as err:
                 raise InvalidManifestError(path) from err
             # noinspection PyUnresolvedReferences
-            # pylint: disable=E1101
             return ResourcesManifest.from_dict(data)  # type: ignore[attr-defined]
 
 
@@ -225,10 +237,14 @@ class ResourcesFinder:
     __RESOURCE_PATTERN: Pattern = re.compile(
         r"""(/\*(?P<comments>[@\S\s\n]*?)\*/\n)?(?P<resource_block_type>resource|data) \"(?P<resource_type>\w+)\" \"(?P<resource_name>[a-zA-Z0-9_-]+)\""""
     )
-    __RESOURCE_ATTR_PATTERN: Pattern = re.compile(r"""@(?P<attr_name>\S+)\s+(?P<attr_value>.+)""")
+    __RESOURCE_ATTR_PATTERN: Pattern = re.compile(
+        r"""@(?P<attr_name>\S+)\s+(?P<attr_value>.+)"""
+    )
 
     @staticmethod
-    def find_in_dir(path: Path, selectors: list[Selector] | None = None) -> list[Resource]:
+    def find_in_dir(
+        path: Path, selectors: list[Selector] | None = None
+    ) -> list[Resource]:
         """
         Find all resources in directory.
 
@@ -244,9 +260,10 @@ class ResourcesFinder:
             resources += ResourcesFinder.find_in_file(file, selectors)
         return resources
 
-    # pylint: disable=R0914
     @staticmethod
-    def find_in_file(path: Path, selectors: list[Selector] | None = None) -> list[Resource]:
+    def find_in_file(
+        path: Path, selectors: list[Selector] | None = None
+    ) -> list[Resource]:
         """
         Find all resources in a file.
 
@@ -275,9 +292,18 @@ class ResourcesFinder:
                         resolution="Add metadata for the above resource.",
                     )
 
-            _, maybe_resource_attrs, resource_block_type, resource_type, resource_name = resource_match
+            (
+                _,
+                maybe_resource_attrs,
+                resource_block_type,
+                resource_type,
+                resource_name,
+            ) = resource_match
             maybe_resource_attrs = maybe_resource_attrs.strip()
-            if not maybe_resource_attrs and resource_block_type == ResourceBlockType.RESOURCE:
+            if (
+                not maybe_resource_attrs
+                and resource_block_type == ResourceBlockType.RESOURCE
+            ):
                 raise InvalidResourcesError(
                     cause=f"The resource `{resource_block_type}:{resource_type}:{resource_name}` at `{path.as_posix()}` isn't describe.",
                     resolution="Add metadata for the above resource.",
@@ -290,7 +316,12 @@ class ResourcesFinder:
                 if attr_match:
                     name, value = attr_match.groups()
                     attrs[name].append(value)
-            resource = Resource(block_type=resource_block_type, name=resource_name, type=resource_type, attrs=attrs)
+            resource = Resource(
+                block_type=resource_block_type,
+                name=resource_name,
+                type=resource_type,
+                attrs=attrs,
+            )
 
             # Filter resource by selector
             match = True

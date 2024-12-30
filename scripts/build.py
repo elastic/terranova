@@ -50,7 +50,9 @@ def run() -> None:
         pyinstaller("terranova.spec", _out=sys.stdout, _err=sys.stderr)
         arch = platform.machine()
         arch = "amd64" if arch == "x86_64" else arch
-        Path("./dist/terranova").replace(Path(f"./dist/terranova-{version}-{system}-{arch}"))
+        Path("./dist/terranova").replace(
+            Path(f"./dist/terranova-{version}-{system}-{arch}")
+        )
     elif system == "linux":
         # Use cross-build to build both amd64 and arm64 versions.
         cmd, env = container_backend()

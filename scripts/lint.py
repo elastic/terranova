@@ -20,7 +20,7 @@ import sys
 
 from sh import ErrorReturnCode
 
-from scripts.utils import detect_git, detect_uv, detect_ruff, fatal
+from scripts.utils import detect_git, detect_ruff, detect_uv, fatal
 
 
 def git_branch_delete(branch_name: str) -> None:

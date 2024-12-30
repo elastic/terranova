@@ -31,28 +31,42 @@ def __set_version(version: str) -> None:
     try:
         data = Constants.TERRANOVA_INIT_PATH.read_text()
     except Exception as err:
-        print(f"The `{Constants.TERRANOVA_INIT_PATH.as_posix()}` can't be read", file=sys.stderr)
+        print(
+            f"The `{Constants.TERRANOVA_INIT_PATH.as_posix()}` can't be read",
+            file=sys.stderr,
+        )
         raise err
 
-    data = re.sub(r"__version__ = \"(.*)\"", f'__version__ = "{version}"', data, count=1)
+    data = re.sub(
+        r"__version__ = \"(.*)\"", f'__version__ = "{version}"', data, count=1
+    )
     try:
         Constants.TERRANOVA_INIT_PATH.write_text(data)
     except Exception as err:
-        print(f"The `{Constants.TERRANOVA_INIT_PATH.as_posix()}` file can't be written", file=sys.stderr)
+        print(
+            f"The `{Constants.TERRANOVA_INIT_PATH.as_posix()}` file can't be written",
+            file=sys.stderr,
+        )
         raise err
 
     # Update project version
     try:
         data = Constants.PYPROJECT_PATH.read_text()
     except Exception as err:
-        print(f"The `{Constants.PYPROJECT_PATH.as_posix()}` can't be read", file=sys.stderr)
+        print(
+            f"The `{Constants.PYPROJECT_PATH.as_posix()}` can't be read",
+            file=sys.stderr,
+        )
         raise err
 
     data = re.sub(r"version = \"(.+)\"", f'version = "{version}"', data, count=1)
     try:
         Constants.PYPROJECT_PATH.write_text(data)
     except Exception as err:
-        print(f"The `{Constants.PYPROJECT_PATH.as_posix()}` file can't be written", file=sys.stderr)
+        print(
+            f"The `{Constants.PYPROJECT_PATH.as_posix()}` file can't be written",
+            file=sys.stderr,
+        )
         raise err
 
 
@@ -60,9 +74,13 @@ def pre() -> None:
     # Ensure we have inputs
     release_version = os.getenv("RELEASE_VERSION")
     if not release_version:
-        return print("You must define `RELEASE_VERSION` environment variable.", file=sys.stderr)
+        return print(
+            "You must define `RELEASE_VERSION` environment variable.", file=sys.stderr
+        )
     if not re.match(r"(\d){1,2}\.(\d){1,2}\.(\d){1,2}", release_version):
-        return print("The `RELEASE_VERSION` should match semver format.", file=sys.stderr)
+        return print(
+            "The `RELEASE_VERSION` should match semver format.", file=sys.stderr
+        )
 
     # Create a new branch
     branch_name = f"release/v{release_version}"
@@ -74,7 +92,14 @@ def pre() -> None:
 
     # Push release branch
     git("add", "--all", _out=sys.stdout, _err=sys.stderr)
-    git("commit", "-m", f"release: terranova v{release_version}", "--no-verify", _out=sys.stdout, _err=sys.stderr)
+    git(
+        "commit",
+        "-m",
+        f"release: terranova v{release_version}",
+        "--no-verify",
+        _out=sys.stdout,
+        _err=sys.stderr,
+    )
     git("push", "origin", branch_name, _out=sys.stdout, _err=sys.stderr)
 
     # Create a PR
@@ -100,7 +125,9 @@ def run() -> None:
         git("tag", release_version)
         git("push", "origin", release_version)
     except ErrorReturnCode:
-        return print(f"The release `v{release_version}` already exists.", file=sys.stderr)
+        return print(
+            f"The release `v{release_version}` already exists.", file=sys.stderr
+        )
 
     # Create the release
     args = [
@@ -121,7 +148,9 @@ def post() -> None:
     # Ensure we have inputs
     next_version = os.getenv("NEXT_VERSION")
     if not next_version:
-        return print("You must define `NEXT_VERSION` environment variable", file=sys.stderr)
+        return print(
+            "You must define `NEXT_VERSION` environment variable", file=sys.stderr
+        )
     if not re.match(r"(\d){1,2}\.(\d){1,2}\.(\d){1,2}-dev", next_version):
         return print("The `NEXT_VERSION` should match semver format.", file=sys.stderr)
 
