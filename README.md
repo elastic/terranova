@@ -24,7 +24,7 @@
 
 ## :package: Prerequisites
 
-- [Python 3.11+](https://docs.python.org/3/) for development.
+- [Python 3.12+](https://docs.python.org/3/) for development.
 - [uv](https://docs.astral.sh/uv/) for build system.
 - [Podman](https://podman.io/docs) for container packaging.
 - [pre-commit](https://pre-commit.com/) for git management.
