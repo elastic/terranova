@@ -22,7 +22,7 @@ from scripts.utils import detect_pyinstaller
 
 
 def run() -> None:
-    args = ["-n", "terranova", "--onefile", "--noconfirm", "--optimize=2"]
+    args = ["-n", "terranova", "--onefile", "--noconfirm", "--optimize=1"]
     exclude_modules = ()
     for exclude_module in exclude_modules:
         args.extend(["--exclude-module", exclude_module])
