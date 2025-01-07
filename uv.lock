@@ -198,14 +198,14 @@ wheels = [
 
 [[package]]
 name = "marshmallow"
-version = "3.23.3"
+version = "3.24.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "packaging" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/fd/c0/d674c9de69227beafa41e1601b0c48b8b51060212abc231d4332e4b1e794/marshmallow-3.23.3.tar.gz", hash = "sha256:d586c8685ebdb80bf754e1f96e3f305aaf30951f1fc69175b977453633467e76", size = 175606 }
+sdist = { url = "https://files.pythonhosted.org/packages/a9/16/da376d6fa50c6e56f4ff881c78bfc12b54a31a820d8d2756b424e0d547c1/marshmallow-3.24.1.tar.gz", hash = "sha256:efdcb656ac8788f0e3d1d938f8dc0f237bf1a99aff8f6dfbffa594981641cea0", size = 176262 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/af/82/d8c37cc92948ce11e5d8d71602bbac7ac4257f9e1f918fd91b1ddac4ec97/marshmallow-3.23.3-py3-none-any.whl", hash = "sha256:20c0f8c613f68bcb45b2a0d3282e2f172575560170bf220d67aafb42717910e4", size = 48911 },
+    { url = "https://files.pythonhosted.org/packages/51/49/e7bc58bb89e5bfc0224e3f95036a14778981b6d483802678c11b8e0b036d/marshmallow-3.24.1-py3-none-any.whl", hash = "sha256:ddb5c9987017d37be351c184e4e867e7bf55f7331f4da730dedad6b7af662cdd", size = 49320 },
 ]
 
 [[package]]
@@ -298,11 +298,11 @@ wheels = [
 
 [[package]]
 name = "pygments"
-version = "2.19.0"
+version = "2.19.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/d3/c0/9c9832e5be227c40e1ce774d493065f83a91d6430baa7e372094e9683a45/pygments-2.19.0.tar.gz", hash = "sha256:afc4146269910d4bdfabcd27c24923137a74d562a23a320a41a55ad303e19783", size = 4967733 }
+sdist = { url = "https://files.pythonhosted.org/packages/7c/2d/c3338d48ea6cc0feb8446d8e6937e1408088a72a39937982cc6111d17f84/pygments-2.19.1.tar.gz", hash = "sha256:61c16d2a8576dc0649d9f39e089b5f02bcd27fba10d8fb4dcc28173f7a45151f", size = 4968581 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/dc/fde3e7ac4d279a331676829af4afafd113b34272393d73f610e8f0329221/pygments-2.19.0-py3-none-any.whl", hash = "sha256:4755e6e64d22161d5b61432c0600c923c5927214e7c956e31c23923c89251a9b", size = 1225305 },
+    { url = "https://files.pythonhosted.org/packages/8a/0b/9fcc47d19c48b59121088dd6da2488a49d5f72dacf8262e2790a1d2c7d15/pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c", size = 1225293 },
 ]
 
 [[package]]
