@@ -71,6 +71,7 @@ class ResourcesRunbookEnv:
 
     name: str
     value: str | None = None
+    with_if: str | None = field(default=False, metadata=config(field_name="if"))
 
 
 @dataclass_json
@@ -106,7 +107,11 @@ class ResourcesRunbook:
                     env[entry.name] = entry.value
                 else:
                     maybe_env_var = os.getenv(entry.name)
-                    if not maybe_env_var:
+                    if (
+                        not maybe_env_var
+                        and entry.with_if is None
+                        or entry.with_if != "is_defined"
+                    ):
                         raise MissingRunbookEnvError(entry.name)
                     env[entry.name] = maybe_env_var
         if self.workdir:

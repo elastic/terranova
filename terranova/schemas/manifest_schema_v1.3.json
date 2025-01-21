@@ -1,7 +1,7 @@
 {
-  "$id": "manifest_schema_v1.2",
+  "$id": "manifest_schema_v1.3",
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "description": "Manifest schema version 1.2",
+  "description": "Manifest schema version 1.3",
   "type": "object",
   "properties": {
     "version": {
@@ -93,6 +93,9 @@
                 "type": "string"
               },
               "value": {
+                "type": "string"
+              },
+              "if": {
                 "type": "string"
               }
             },
