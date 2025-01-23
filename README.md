@@ -92,6 +92,20 @@ brew tap elastic/terranova
 brew install terranova
 ```
 
+### Single-line installation
+
+```shell
+curl -sSL https://raw.githubusercontent.com/elastic/terranova/0.6.5/install.sh | sh -s
+```
+
+If you use `wget` instead:
+
+```shell
+wget -qO- https://raw.githubusercontent.com/elastic/terranova/0.6.5/install.sh | sh -s
+```
+
+That will download `terranova`, put it inside `/usr/local/bin/` and give it execution rights with `chmod`.
+
 ### How to install as Standalone
 
 ```bash
