@@ -70,6 +70,30 @@ def __set_version(version: str) -> None:
         raise err
 
 
+def __set_version_install_file(version: str) -> None:
+    # Update install file version version
+    try:
+        data = Constants.INSTALL_PATH.read_text()
+    except Exception as err:
+        print(
+            f"The `{Constants.INSTALL_PATH.as_posix()}` can't be read",
+            file=sys.stderr,
+        )
+        raise err
+
+    data = re.sub(
+        r"VERSION=\"(.*)\"", f'VERSION="{version}"', data, count=1
+    )
+    try:
+        Constants.INSTALL_PATH.write_text(data)
+    except Exception as err:
+        print(
+            f"The `{Constants.INSTALL_PATH.as_posix()}` file can't be written",
+            file=sys.stderr,
+        )
+        raise err
+
+
 def pre() -> None:
     # Ensure we have inputs
     release_version = os.getenv("RELEASE_VERSION")
@@ -89,6 +113,9 @@ def pre() -> None:
 
     # Update all files
     __set_version(release_version)
+
+    # Update install file
+    __set_version_install_file(release_version)
 
     # Push release branch
     git("add", "--all", _out=sys.stdout, _err=sys.stderr)
