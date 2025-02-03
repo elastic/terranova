@@ -72,7 +72,7 @@ jobs:
     # If you change the branch name in  scripts/release.py please
     # update the condition below.
     # We cannot test the install if the release has not happened yet.
-    if: ${{ !startsWith(github.ref, 'refs/heads/feat/pre-release-v') }}
+    if: ${{ !startsWith(github.head_ref, 'feat/pre-release-v') }}
     steps:
       - uses: actions/checkout@v4
 
