@@ -12,6 +12,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Ref: https://docs.astral.sh/uv/concepts/projects/sync/#checking-if-the-lockfile-is-up-to-date
+  UV_FROZEN: "true"
+
 ## Concurrency only allowed in the main branch.
 ## So old builds running for old commits within the same Pull Request are cancelled
 concurrency:

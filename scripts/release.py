@@ -81,9 +81,7 @@ def __set_version_install_file(version: str) -> None:
         )
         raise err
 
-    data = re.sub(
-        r"VERSION=\"(.*)\"", f'VERSION="{version}"', data, count=1
-    )
+    data = re.sub(r"VERSION=\"(.*)\"", f'VERSION="{version}"', data, count=1)
     try:
         Constants.INSTALL_PATH.write_text(data)
     except Exception as err:
