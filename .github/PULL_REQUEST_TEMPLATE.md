@@ -1,9 +1,9 @@
-## What is the change being made?
+## 🧑‍💻What is the change being made?
 
-## Why is the change being made?
+## :question: Why is the change being made?
 
-## How has this been tested?
+## :white_check_mark: How has this been tested?
 
-## How has this been documented?
+## :books: How has this been documented?
 
-## Related Issues
+## :link: Related Issues
