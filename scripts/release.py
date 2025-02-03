@@ -107,7 +107,9 @@ def pre() -> None:
         )
 
     # Create a new branch
-    branch_name = f"release/v{release_version}"
+    # TODO: if you change the branch_name, please update the
+    #       condition at .github/workflows/ci.yml
+    branch_name = f"feat/pre-release-v{release_version}"
     git = detect_git()
     git("checkout", "-b", branch_name, _out=sys.stdout, _err=sys.stderr)
 
