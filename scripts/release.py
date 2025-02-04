@@ -182,6 +182,8 @@ def post() -> None:
         return print("The `NEXT_VERSION` should match semver format.", file=sys.stderr)
 
     # Create a new branch
+    # TODO: if you change the branch_name, please update the
+    #       condition at .github/workflows/ci.yml
     branch_name = f"feat/post-release-v{next_version}"
     git = detect_git()
     git("checkout", "-b", branch_name, _out=sys.stdout, _err=sys.stderr)
