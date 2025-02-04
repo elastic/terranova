@@ -4,7 +4,7 @@ set -o errexit
 set -o nounset
 
 ## NOTE: Bump this version when a new release.
-VERSION="0.6.4"
+VERSION="0.6.5"
 OS=$(uname -s| tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m| tr '[:upper:]' '[:lower:]')
 if [ "${ARCH}" = "aarch64" ] ; then
