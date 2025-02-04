@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+env:
+  # Ref: https://docs.astral.sh/uv/concepts/projects/sync/#checking-if-the-lockfile-is-up-to-date
+  UV_FROZEN: "true"
+
 jobs:
   compose:
     runs-on: ubuntu-latest
