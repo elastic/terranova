@@ -608,26 +608,26 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "click", specifier = ">=8.1.7" },
+    { name = "click", specifier = ">=8.1.8" },
     { name = "dataclasses-json", specifier = ">=0.6.7" },
     { name = "envyaml", specifier = ">=1.10.211231" },
-    { name = "jinja2", specifier = ">=3.1.4" },
+    { name = "jinja2", specifier = ">=3.1.6" },
     { name = "jsonschema", specifier = ">=4.23.0" },
-    { name = "mdformat", specifier = ">=0.7.18" },
+    { name = "mdformat", specifier = ">=0.7.22" },
     { name = "overrides", specifier = ">=7.7.0" },
-    { name = "rich", specifier = ">=13.9.4" },
-    { name = "sh", specifier = ">=2.1.0" },
+    { name = "rich", specifier = ">=14.0.0" },
+    { name = "sh", specifier = ">=2.2.2" },
 ]
 
 [package.metadata.requires-dev]
-build = [{ name = "pyinstaller", specifier = ">=6.11.1" }]
+build = [{ name = "pyinstaller", specifier = ">=6.13.0" }]
 dev = [
     { name = "licenseheaders", specifier = ">=0.8.8" },
-    { name = "poethepoet", specifier = ">=0.30.0" },
-    { name = "pytest", specifier = ">=8.3.3" },
+    { name = "poethepoet", specifier = ">=0.33.1" },
+    { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-timeout", specifier = ">=2.3.1" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
-    { name = "ruff", specifier = ">=0.8.0" },
+    { name = "ruff", specifier = ">=0.11.5" },
 ]
 
 [[package]]
