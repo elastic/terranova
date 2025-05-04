@@ -336,15 +336,15 @@ wheels = [
 
 [[package]]
 name = "pyinstaller-hooks-contrib"
-version = "2025.3"
+version = "2025.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "packaging" },
     { name = "setuptools" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/18/46/195324574e44e52c1ba7f7b0607bc9d488b057d93e253918f1a2759d6a98/pyinstaller_hooks_contrib-2025.3.tar.gz", hash = "sha256:af129da5cd6219669fbda360e295cc822abac55b7647d03fec63a8fcf0a608cf", size = 162501, upload-time = "2025-04-16T16:56:11.168Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e3/94/dfc5c7903306211798f990e6794c2eb7b8685ac487b26979e9255790419c/pyinstaller_hooks_contrib-2025.4.tar.gz", hash = "sha256:5ce1afd1997b03e70f546207031cfdf2782030aabacc102190677059e2856446", size = 162628, upload-time = "2025-05-03T20:15:55.983Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9a/98/0273ffc4f85a4038c8d316a75ef5ac1f10f1bbe5ba50c27871b73da2e3d2/pyinstaller_hooks_contrib-2025.3-py3-none-any.whl", hash = "sha256:70cba46b1a6b82ae9104f074c25926e31f3dde50ff217434d1d660355b949683", size = 434307, upload-time = "2025-04-16T16:56:09.862Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/e1/ed48c7074145898e5c5b0072e87be975c5bd6a1d0f08c27a1daa7064fca0/pyinstaller_hooks_contrib-2025.4-py3-none-any.whl", hash = "sha256:6c2d73269b4c484eb40051fc1acee0beb113c2cfb3b37437b8394faae6f0d072", size = 434451, upload-time = "2025-05-03T20:15:54.579Z" },
 ]
 
 [[package]]
@@ -561,11 +561,11 @@ wheels = [
 
 [[package]]
 name = "setuptools"
-version = "80.2.0"
+version = "80.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/24/65/19a02e93da9d9f118ecb311419a353ae68a8e236c057bf164c866daa227f/setuptools-80.2.0.tar.gz", hash = "sha256:16a390b41627e1455567193435e7cafa9101803ffaa2fdd9ecd0af098301981d", size = 1354232, upload-time = "2025-05-03T02:58:17.474Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/51/6c/a3f892949418b5b9aced7396919c75ffb57e38f08b712b565f5eb10677ee/setuptools-80.3.0.tar.gz", hash = "sha256:ec8308eb180b2312062b1c5523204acf872cd8b0a9e6c2ae76431b22bc4065d7", size = 1314475, upload-time = "2025-05-03T09:17:32.334Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/51/95/522fb99f76ecf2efe0a372ee02665a3cda1e5653b37514fd05c98f05a9cf/setuptools-80.2.0-py3-none-any.whl", hash = "sha256:5f982284ad5d644764e1985baca205e235651b55f9a7ea8d46878d37104aa5e5", size = 1240763, upload-time = "2025-05-03T02:58:14.874Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/61/a6239ff35d64e55def020335626894895847cc6659c0f8e1b676c58aad3b/setuptools-80.3.0-py3-none-any.whl", hash = "sha256:a65cffc4fb86167e3020b3ef58e08226baad8b29a3b34ce2c9d07e901bac481d", size = 1200273, upload-time = "2025-05-03T09:17:29.995Z" },
 ]
 
 [[package]]
