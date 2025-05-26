@@ -17,6 +17,8 @@ runs:
 
     - name: Install dependencies
       run: |
+        # Enable frozen mode to avoid updating `uv.lock` in CI
+        echo "UV_FROZEN=true" >> "${GITHUB_ENV}"
         uv sync
         uv run poe env:configure
       shell: "bash"
