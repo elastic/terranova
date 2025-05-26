@@ -13,5 +13,5 @@ def test_version(runner: CliRunner) -> None:
 
 def test_with_no_command(runner: CliRunner) -> None:
     result = runner.invoke(main, args=[])
-    stdout, _ = assert_result(result)
-    assert f"Commands" in stdout
+    assert result.exit_code == 2
+    assert "Commands" in result.stderr
