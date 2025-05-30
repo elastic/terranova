@@ -5,25 +5,29 @@
 
 version: 2
 updates:
-  # Maintain dependencies for GitHub Actions (/.github/workflows)
-  - package-ecosystem: "github-actions"
+  # Maintain python dependencies
+  - package-ecosystem: "uv"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "sunday"
       time: "22:00"
     groups:
-      github-actions:
+      uv-dependencies:
         patterns:
           - "*"
 
-  # Maintain dependencies for GitHub composite actions
+  # Maintain dependencies for GitHub Actions (/.github/workflows)
   - package-ecosystem: "github-actions"
-    directory: "/.github/workflows/env-install"
+    directories:
+      - "/"
+      - "/.github/workflows/*"
     schedule:
       interval: "weekly"
       day: "sunday"
       time: "22:00"
+    labels:
+      - dependencies
     groups:
       github-actions:
         patterns:
