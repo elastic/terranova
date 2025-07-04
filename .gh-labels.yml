@@ -1,0 +1,92 @@
+---
+
+# Ref: github-label-sync --access-token "$(gh auth token)" --labels .gh-labels.yml elastic/terranova
+
+- name: "area=ci"
+  color: "6da0e2"
+  description: "Related to CI"
+  aliases: []
+- name: "area=docs"
+  color: "6da0e2"
+  description: "Related to documentation"
+  aliases: []
+- name: "area=infra"
+  color: "6da0e2"
+  description: "Related to infra"
+  aliases: []
+- name: "area=source"
+  color: "6da0e2"
+  description: "Related to source code"
+  aliases: []
+- name: "platform=all"
+  color: "f39b67"
+  description: "Affects or is relevant to all supported platforms"
+  aliases: []
+- name: "platform=unix"
+  color: "f39b67"
+  description: "Affects or is relevant to Unix-based platforms"
+  aliases: []
+- name: "platform=windows"
+  color: "f39b67"
+  description: "Affects or is relevant to Windows platforms"
+  aliases: []
+- name: "status=duplicate"
+  color: "c5c5c5"
+  description: "This issue duplicates an existing one"
+  aliases: []
+- name: "status=fixed"
+  color: "7caf73"
+  description: "The issue has been resolved"
+  aliases: []
+- name: "status=in-progress"
+  color: "c6e3c1"
+  description: "Work is actively being done on this issue"
+  aliases: []
+- name: "status=invalid"
+  color: "c5c5c5"
+  description: "The issue is not valid"
+  aliases: []
+- name: "status=obsolete"
+  color: "c5c5c5"
+  description: "The issue is outdated or no longer relevant"
+  aliases: []
+- name: "status=research"
+  color: "c6e3c1"
+  description: "The issue is under investigation or requires further exploration"
+  aliases: []
+- name: "status=triaged"
+  color: "c6e3c1"
+  description: "The issue has been reviewed and prioritized"
+  aliases: []
+- name: "status=will-not-fix"
+  color: "c5c5c5"
+  description: "The issue has been acknowledged but won’t be addressed"
+  aliases: []
+- name: "status=working-as-intended"
+  color: "c5c5c5"
+  description: "The behavior reported is correct and not a bug"
+  aliases: []
+- name: "type=addition"
+  color: "f1d76c"
+  description: "A new feature or capability is being introduced"
+  aliases: []
+- name: "type=defect"
+  color: "d23a2b"
+  description: "A bug or error that needs to be fixed"
+  aliases: []
+- name: "type=documentation"
+  color: "f1d76c"
+  description: "Related to docs: missing info, typos, updates, or improvements"
+  aliases: []
+- name: "type=enhancement"
+  color: "f1d76c"
+  description: "Improves an existing feature or component"
+  aliases: []
+- name: "type=other"
+  color: "f1d76c"
+  description: "Miscellaneous activities not covered by other type= labels"
+  aliases: []
+- name: "type=performance"
+  color: "f1d76c"
+  description: "Targets speed, efficiency, or resource optimization"
+  aliases: []
