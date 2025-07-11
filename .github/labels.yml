@@ -1,6 +1,6 @@
 ---
 
-# Ref: github-label-sync --access-token "$(gh auth token)" --labels .gh-labels.yml elastic/terranova
+# Ref: github-label-sync --access-token "$(gh auth token)" --labels .github/labels.yml elastic/terranova
 
 - name: "area=ci"
   color: "6da0e2"
