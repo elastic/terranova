@@ -26,7 +26,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install environment
         uses: ./.github/workflows/env-install
@@ -45,7 +45,7 @@ jobs:
           - ubuntu-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install environment
         uses: ./.github/workflows/env-install
@@ -58,7 +58,7 @@ jobs:
       - build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install environment
         uses: ./.github/workflows/env-install
@@ -78,7 +78,7 @@ jobs:
     # We cannot test the install if the release has not happened yet.
     if: ${{ github.event_name == 'pull_request' && !startsWith(github.head_ref, 'feat/pre-release-v') }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: run install.sh
         run: ./install.sh
