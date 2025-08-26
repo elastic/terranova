@@ -1,5 +1,5 @@
 # Base image for build
-FROM debian:bullseye-slim AS builder
+FROM debian:bookworm-slim AS builder
 
 # Switch workdir
 WORKDIR /opt/terranova
