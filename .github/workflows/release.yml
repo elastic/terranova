@@ -39,7 +39,7 @@ jobs:
       - name: Build
         run: uv run poe build
 
-      - uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+      - uses: actions/attest-build-provenance@v3
         with:
           subject-path: "dist/*"
 
