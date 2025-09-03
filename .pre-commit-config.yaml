@@ -4,13 +4,17 @@ default_install_hook_types: [ pre-commit, commit-msg ]
 
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.5
+    rev: v0.12.10
     hooks:
-      - id: ruff
-        args: [ --fix ]
+      # Run the linter.
+      - id: ruff-check
+        args:
+          - --select=I
+          - --fix
+      # Run the formatter.
       - id: ruff-format
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v6.0.0
     hooks:
       - id: check-json
         name: check-json-schema
