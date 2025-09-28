@@ -21,7 +21,7 @@ import os
 import pkgutil
 import re
 import sys
-from collections import defaultdict
+from collections import ChainMap, defaultdict
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
@@ -91,7 +91,7 @@ class ResourcesRunbook:
     args: list[str] | None = None
     env: list[ResourcesRunbookEnv] | None = None
 
-    def exec(self, path: str, workdir: Path) -> None:
+    def exec(self, path: str, workdir: Path, import_vars: dict[str, str]) -> None:
         """Try to execute the runbook."""
         env = {
             "TERRANOVA_PATH": path,
@@ -102,15 +102,15 @@ class ResourcesRunbook:
         if cmd_path:
             env["PATH"] = cmd_path
         if self.env:
+            env_ctx = ChainMap(import_vars, os.environ)
             for entry in self.env:
+                entry: ResourcesRunbookEnv
                 if entry.value:
                     env[entry.name] = entry.value
                 else:
-                    maybe_env_var = os.getenv(entry.name)
-                    if (
-                        not maybe_env_var
-                        and entry.with_if is None
-                        or entry.with_if != "is_defined"
+                    maybe_env_var = env_ctx.get(entry.name)
+                    if not maybe_env_var and (
+                        entry.with_if is None or entry.with_if != "is_defined"
                     ):
                         raise MissingRunbookEnvError(entry.name)
                     env[entry.name] = maybe_env_var

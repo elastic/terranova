@@ -131,14 +131,18 @@ def mount_context(
         manifest = read_manifest(full_path)
 
     # Import variables
-    variables: dict[str, str] | None = None
-    if manifest.imports and import_vars:
-        variables = {}
+    variables = extract_import_vars(manifest) if import_vars else None
+    return Terraform(full_path, variables)
+
+
+def extract_import_vars(manifest: ResourcesManifest) -> dict[str, str]:
+    """Extract import variables from manifest."""
+    variables: dict[str, str] = {}
+    if manifest.imports:
         for importer in manifest.imports:
             target = importer.target if importer.target else importer.resource
             variables[target] = extract_output_var(importer.source, importer.resource)
-
-    return Terraform(full_path, variables)
+    return variables
 
 
 def extract_output_var(path: str, name: str) -> str:
