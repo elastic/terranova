@@ -32,6 +32,14 @@ Tracker = "https://github.com/elastic/terranova/issues"
 [project.scripts]
 terranova = "terranova.cli:main"
 
+[build-system]
+requires = ["uv_build>=0.8.13,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "terranova"
+
 [dependency-groups]
 build = [
   "pyinstaller>=6.13.0", # GPL-2.0: https://pyinstaller.org/en/stable/license.html
@@ -126,13 +134,3 @@ script = "scripts.release:run"
 [tool.poe.tasks."release:post"]
 help = "Prepare next iteration."
 script = "scripts.release:post"
-
-[tool.hatch.metadata]
-allow-direct-references = true
-
-[tool.hatch.build.targets.wheel]
-packages = ["terranova"]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
