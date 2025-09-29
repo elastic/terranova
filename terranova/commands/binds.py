@@ -34,6 +34,7 @@ from terranova.commands.helpers import (
     Selector,
     SelectorType,
     discover_resources,
+    extract_import_vars,
     extract_output_var,
     mount_context,
     read_manifest,
@@ -611,10 +612,13 @@ def runbook(path: str, name: str) -> None:
     if len(matching_runbooks) > 1:
         Log.fatal("execute runbook", AmbiguousRunbookError(name))
 
+    # Import vars
+    import_vars = extract_import_vars(manifest)
+
     # Execute runbook
     executable_runbook = next(iter(matching_runbooks))
     try:
-        executable_runbook.exec(path, full_path / "runbooks")
+        executable_runbook.exec(path, full_path / "runbooks", import_vars)
     except MissingRunbookEnvError as err:
         Log.fatal("find environment variable", err)
     except ErrorReturnCode as err:
