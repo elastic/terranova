@@ -20,7 +20,7 @@ import os
 import sys
 from contextlib import contextmanager
 from pathlib import Path
-from typing import ContextManager
+from typing import Iterator
 
 from overrides import override
 from sh import (
@@ -50,7 +50,7 @@ class Bind:
         return Path(self._cmd._path)
 
     @contextmanager
-    def _exec_ctx(self, *args, **kwargs) -> ContextManager[RunningCommand]:
+    def _exec_ctx(self, *args, **kwargs) -> Iterator[RunningCommand]:
         """
         Run the command and handle lifecycle in case we kill the parent process.
         Note: It's useful for composite action that need multiple calls.
@@ -109,7 +109,7 @@ class Terraform(Bind):
         self.__variables = variables
 
     @override
-    def _exec_ctx(self, *args, **kwargs) -> ContextManager[RunningCommand]:
+    def _exec_ctx(self, *args, **kwargs) -> Iterator[RunningCommand]:
         # Predicate for allowed env vars
         def is_allowed_env_var(env_var: str) -> bool:
             return (
@@ -117,6 +117,18 @@ class Terraform(Bind):
                 or env_var.startswith("TERRANOVA_")
                 # Implicit credentials for s3 backend
                 or env_var.startswith("AWS_")
+                # Forward gcp env vars
+                or env_var
+                in [
+                    "CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE",
+                    "CLOUDSDK_CORE_PROJECT",
+                    "CLOUDSDK_PROJECT",
+                    "GCLOUD_PROJECT",
+                    "GCP_PROJECT",
+                    "GOOGLE_APPLICATION_CREDENTIALS",
+                    "GOOGLE_CLOUD_PROJECT",
+                    "GOOGLE_GHA_CREDS_PATH",
+                ]
                 # Forward asdf for shims support
                 or env_var.startswith("ASDF_")
                 or env_var in ["HOME", "PATH"]
