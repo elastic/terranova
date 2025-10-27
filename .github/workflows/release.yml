@@ -43,7 +43,7 @@ jobs:
         with:
           subject-path: "dist/*"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: terranova-${{ matrix.os }}
           path: "dist/*"
@@ -57,7 +57,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v6
         with:
           merge-multiple: true
 
