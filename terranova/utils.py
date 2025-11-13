@@ -16,14 +16,20 @@
 # specific language governing permissions and limitations
 # under the License.
 #
+from functools import partial
 from pathlib import Path
 from threading import Lock
 from typing import Any, Final, NoReturn
 
 from click.exceptions import Exit
 from rich.console import Console
+from serde import disabled
+from serde import serde as inner_serde
 
 from .exceptions import ExplainedError
+
+# Shorthand for serde with type check disabled
+serde = partial(inner_serde, type_check=disabled)
 
 
 class Constants:
