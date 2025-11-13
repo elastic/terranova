@@ -22,15 +22,15 @@ import pkgutil
 import re
 import sys
 from collections import ChainMap, defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 from re import Pattern
 
 import yaml
-from dataclasses_json import config, dataclass_json
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
+from serde import field, from_dict
 from sh import Command
 
 from .exceptions import (
@@ -41,10 +41,10 @@ from .exceptions import (
     UnreadableManifestError,
     VersionManifestError,
 )
-from .utils import Constants, SharedContext
+from .utils import Constants, SharedContext, serde
 
 
-@dataclass_json
+@serde
 @dataclass(frozen=True)
 class ResourcesMetadata:
     """Represents resources metadata"""
@@ -55,7 +55,7 @@ class ResourcesMetadata:
     contact: str | None = None
 
 
-@dataclass_json
+@serde
 @dataclass(frozen=True)
 class ResourcesDependency:
     """Represents resources dependency"""
@@ -64,17 +64,17 @@ class ResourcesDependency:
     target: str
 
 
-@dataclass_json
+@serde
 @dataclass(frozen=True)
 class ResourcesRunbookEnv:
     """Represents resources runbook env."""
 
     name: str
     value: str | None = None
-    with_if: str | None = field(default=False, metadata=config(field_name="if"))
+    with_if: str | None = field(default=False, rename="if")
 
 
-@dataclass_json
+@serde
 @dataclass(frozen=True)
 class ResourcesRunbook:
     """
@@ -127,17 +127,17 @@ class ResourcesRunbook:
         )
 
 
-@dataclass_json
+@serde
 @dataclass(frozen=True)
 class ResourcesImport:
     """Represents resources import."""
 
-    source: str = field(metadata=config(field_name="from"))
-    resource: str = field(metadata=config(field_name="import"))
-    target: str | None = field(default=None, metadata=config(field_name="as"))
+    source: str = field(rename="from")
+    resource: str = field(rename="import")
+    target: str | None = field(default=None, rename="as")
 
 
-@dataclass_json
+@serde
 @dataclass(frozen=True)
 class ResourcesManifest:
     """Represents a resources manifest"""
@@ -194,8 +194,7 @@ class ResourcesManifest:
                 validate(instance=data, schema=schema)
             except ValidationError as err:
                 raise InvalidManifestError(path) from err
-            # noinspection PyUnresolvedReferences
-            return ResourcesManifest.from_dict(data)  # type: ignore[attr-defined]
+            return from_dict(ResourcesManifest, data)
 
 
 class ResourceBlockType(StrEnum):
