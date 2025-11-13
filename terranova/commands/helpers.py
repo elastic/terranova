@@ -18,11 +18,11 @@
 #
 import os
 from pathlib import Path
+from typing import override
 
 import click
 from click import Parameter
 from click.exceptions import Exit
-from overrides import override
 from sh import ErrorReturnCode
 
 from terranova.binds import Terraform
