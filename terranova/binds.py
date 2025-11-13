@@ -20,9 +20,8 @@ import os
 import sys
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, override
 
-from overrides import override
 from sh import (
     Command,
     CommandNotFound,
