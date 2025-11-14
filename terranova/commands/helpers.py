@@ -23,10 +23,10 @@ from typing import override
 import click
 from click import Parameter
 from click.exceptions import Exit
-from sh import ErrorReturnCode
 
 from terranova.binds import Terraform
 from terranova.exceptions import InvalidResourcesError, ManifestError
+from terranova.process import ErrorReturnCode
 from terranova.resources import Resource, ResourcesFinder, ResourcesManifest, Selector
 from terranova.utils import Constants, Log, SharedContext
 

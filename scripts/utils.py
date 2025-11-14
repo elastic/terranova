@@ -19,10 +19,11 @@
 import os
 import re
 import sys
+from io import StringIO
 from pathlib import Path
 from typing import Final, NoReturn
 
-from sh import Command, CommandNotFound
+from terranova.process import Command, CommandNotFound, EnvCmd
 
 
 class Constants:
@@ -124,12 +125,15 @@ def project_version() -> str:
         current project version.
     """
     uv = detect_uv()
-    details = uv("pip", "show", "terranova", _err=sys.stderr)
-    version = re.search(r"Version: (.*)", details).group(1)
-    return version.replace(".dev0", "-dev").strip()
+    capture_stdout = StringIO()
+    uv.args("pip", "show", "terranova").stdout(capture_stdout).stderr(sys.stderr).exec()
+    match = re.search(r"Version: (.*)", capture_stdout.getvalue())
+    if not match:
+        fatal("Failed to detect project version")
+    return match.group(1).replace(".dev0", "-dev").strip()
 
 
-def container_backend() -> tuple[Command, dict[str, str]]:
+def container_backend() -> Command:
     """
     Try to detect a container backend.
     Either podman or docker.
@@ -140,16 +144,16 @@ def container_backend() -> tuple[Command, dict[str, str]]:
         CommandNotFound: if a suitable backend can't be found.
     """
     cmd = None
-    env = os.environ.copy()
+    env = EnvCmd.inherit()
     for backend in ["docker", "podman"]:
         try:
             cmd = Command(backend)
         except CommandNotFound:
             continue
         if "podman" == backend:
-            env["BUILDAH_FORMAT"] = "docker"
+            env.add({"BUILDAH_FORMAT": "docker"})
         break
 
     if not cmd:
         raise CommandNotFound("Unable to find a suitable backend: docker or podman")
-    return cmd, env
+    return cmd.env(env.build())

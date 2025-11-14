@@ -21,7 +21,7 @@ import re
 import sys
 from pathlib import Path
 
-from sh import ErrorReturnCode
+from terranova.process import ErrorReturnCode
 
 from scripts.utils import Constants, detect_gh, detect_git, project_version
 
@@ -109,7 +109,7 @@ def pre() -> None:
     #       condition at .github/workflows/ci.yml
     branch_name = f"feat/pre-release-v{release_version}"
     git = detect_git()
-    git("checkout", "-b", branch_name, _out=sys.stdout, _err=sys.stderr)
+    git.args("checkout", "-b", branch_name).inherit_out().exec()
 
     # Update all files
     __set_version(release_version)
@@ -118,28 +118,13 @@ def pre() -> None:
     __set_version_install_file(release_version)
 
     # Push release branch
-    git("add", "--all", _out=sys.stdout, _err=sys.stderr)
-    git(
-        "commit",
-        "-m",
-        f"release: terranova v{release_version}",
-        "--no-verify",
-        _out=sys.stdout,
-        _err=sys.stderr,
-    )
-    git("push", "origin", branch_name, _out=sys.stdout, _err=sys.stderr)
+    git.args("add", "--all").inherit_out().exec()
+    git.args("commit", "-m", f"release: terranova v{release_version}", "--no-verify").inherit_out().exec()
+    git.args("push", "origin", branch_name).inherit_out().exec()
 
     # Create a PR
     gh = detect_gh()
-    gh(
-        "pr",
-        "create",
-        "--fill",
-        "--base=main",
-        f"--head={branch_name}",
-        _out=sys.stdout,
-        _err=sys.stderr,
-    )
+    gh.args("pr", "create", "--fill", "--base=main", f"--head={branch_name}").inherit_out().exec()
 
 
 def run() -> None:
@@ -149,8 +134,8 @@ def run() -> None:
     # Create the release tag
     try:
         git = detect_git()
-        git("tag", release_version)
-        git("push", "origin", release_version)
+        git.args("tag", release_version).exec()
+        git.args("push", "origin", release_version).exec()
     except ErrorReturnCode:
         return print(
             f"The release `v{release_version}` already exists.", file=sys.stderr
@@ -168,7 +153,7 @@ def run() -> None:
     binaries = [file.absolute().as_posix() for file in Path(".").glob("./terranova-*")]
     args.extend(binaries)
     gh = detect_gh()
-    gh(args, _out=sys.stdout, _err=sys.stderr)
+    gh.args(*args).inherit_out().exec()
 
 
 def post() -> None:
@@ -186,31 +171,16 @@ def post() -> None:
     #       condition at .github/workflows/ci.yml
     branch_name = f"feat/post-release-v{next_version}"
     git = detect_git()
-    git("checkout", "-b", branch_name, _out=sys.stdout, _err=sys.stderr)
+    git.args("checkout", "-b", branch_name).inherit_out().exec()
 
     # Update all files
     __set_version(next_version)
 
     # Push changes
-    git("add", "--all", _out=sys.stdout, _err=sys.stderr)
-    git(
-        "commit",
-        "-m",
-        "chore: prepare for next iteration",
-        "--no-verify",
-        _out=sys.stdout,
-        _err=sys.stderr,
-    )
-    git("push", "origin", branch_name, _out=sys.stdout, _err=sys.stderr)
+    git.args("add", "--all").inherit_out().exec()
+    git.args("commit", "-m", "chore: prepare for next iteration", "--no-verify").inherit_out().exec()
+    git.args("push", "origin", branch_name).inherit_out().exec()
 
     # Create a PR
     gh = detect_gh()
-    gh(
-        "pr",
-        "create",
-        "--fill",
-        "--base=main",
-        f"--head={branch_name}",
-        _out=sys.stdout,
-        _err=sys.stderr,
-    )
+    gh.args("pr", "create", "--fill", "--base=main", f"--head={branch_name}").inherit_out().exec()

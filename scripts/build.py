@@ -18,6 +18,7 @@
 #
 import platform
 import sys
+from io import StringIO
 from pathlib import Path
 from time import time
 
@@ -32,7 +33,9 @@ from scripts.utils import (
 
 def run() -> None:
     git = detect_git()
-    commit_hash_short = git("rev-parse", "--short", "HEAD").strip()
+    capture_stdout = StringIO()
+    git.args("rev-parse", "--short", "HEAD").stdout(capture_stdout).exec()
+    commit_hash_short = capture_stdout.getvalue().strip()
     current_time_epoch = int(time())
     version = project_version()
     python_version = platform.python_version()
@@ -46,8 +49,8 @@ def run() -> None:
 
     system = platform.system().lower()
     if system == "darwin":
-        pyinstaller = detect_pyinstaller()
-        pyinstaller("terranova.spec", _out=sys.stdout, _err=sys.stderr)
+        pyinstaller = detect_pyinstaller().inherit_out()
+        pyinstaller.args("terranova.spec").exec()
         arch = platform.machine()
         arch = "amd64" if arch == "x86_64" else arch
         Path("./dist/terranova").replace(
@@ -55,10 +58,10 @@ def run() -> None:
         )
     elif system == "linux":
         # Use cross-build to build both amd64 and arm64 versions.
-        cmd, env = container_backend()
+        cmd = container_backend()
         for arch in ["amd64", "arm64"]:
             platform_arch = f"linux/{arch}"
-            cmd(
+            cmd.args(
                 "buildx",
                 "build",
                 "--load",
@@ -71,35 +74,26 @@ def run() -> None:
                 "-f",
                 "Containerfile",
                 ".",
-                _out=sys.stdout,
-                _err=sys.stderr,
-                _env=env,
-            )
-            container_id = cmd(
+            ).inherit_out().exec()
+            capture_stdout = StringIO()
+            cmd.args(
                 "run",
                 "-d",
                 "--platform",
                 platform_arch,
                 "--entrypoint=cat",
                 f"{Constants.REGISTRY_URL}/terranova:{image_id}",
-                _err=sys.stderr,
-                _env=env,
-            ).strip()
-            cmd(
+            ).stdout(capture_stdout).exec()
+            container_id = capture_stdout.getvalue().strip()
+            cmd.args(
                 "cp",
                 f"{container_id}:/opt/terranova/dist/terranova",
                 (local_dist_path / f"terranova-{version}-linux-{arch}").as_posix(),
-                _out=sys.stdout,
-                _err=sys.stderr,
-                _env=env,
-            )
-            cmd(
+            ).inherit_out().exec()
+            cmd.args(
                 "rm",
                 "-f",
                 container_id,
-                _out=sys.stdout,
-                _err=sys.stderr,
-                _env=env,
-            )
+            ).exec()
     else:
         print(f"Unsupported system: {system}", file=sys.stderr)

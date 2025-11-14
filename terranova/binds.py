@@ -16,75 +16,13 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-import os
-import sys
-from contextlib import contextmanager
+from io import StringIO
 from pathlib import Path
-from typing import Iterator, override
+from typing import override
 
-from sh import (
-    Command,
-    CommandNotFound,
-    ErrorReturnCode,
-    RunningCommand,
-    TimeoutException,
-)
-
-from .exceptions import InvalidResourcesError
-from .utils import Constants, Log, SharedContext
-
-
-class Bind:
-    """Represents an abstract external bind."""
-
-    def __init__(self, cmd: Command) -> None:
-        """Init bind."""
-        self._cmd = cmd
-
-    def binary_path(self) -> Path:
-        """
-        Returns:
-            path where binary is installed.
-        """
-        return Path(self._cmd._path)
-
-    @contextmanager
-    def _exec_ctx(self, *args, **kwargs) -> Iterator[RunningCommand]:
-        """
-        Run the command and handle lifecycle in case we kill the parent process.
-        Note: It's useful for composite action that need multiple calls.
-
-        Returns:
-            process execution context.
-        """
-        process: RunningCommand | None = None
-        try:
-            kwargs = {
-                **kwargs,
-                **{"_bg": True, "_bg_exc": False, "_truncate_exc": False},
-            }
-            process = self._cmd(*args, **kwargs)
-            if isinstance(process, RunningCommand):
-                yield process
-            else:
-                raise ValueError("Not a running command")
-        finally:
-            if process is not None and process.is_alive():
-                process.terminate()
-                try:
-                    process.wait(timeout=10)
-                except TimeoutException:
-                    process.kill()
-
-    def _exec(self, *args, **kwargs) -> RunningCommand:
-        """
-        Run the command and handle lifecycle in case we kill the parent process.
-
-        Returns:
-            process execution result.
-        """
-        with self._exec_ctx(*args, **kwargs) as process:
-            return process.wait()
+from terranova.exceptions import InvalidResourcesError
+from terranova.process import Bind, EnvCmd, CommandNotFound, Command, ErrorReturnCode
+from terranova.utils import Log, SharedContext
 
 
 class Terraform(Bind):
@@ -93,7 +31,7 @@ class Terraform(Bind):
     def __init__(self, work_dir: Path, variables: dict[str, str] | None = None) -> None:
         """Init terraform bind."""
         try:
-            super().__init__(cmd=Command("terraform"))
+            super().__init__("terraform")
         except CommandNotFound as err:
             Log.fatal("detect terraform binary", err)
 
@@ -108,59 +46,56 @@ class Terraform(Bind):
         self.__variables = variables
 
     @override
-    def _exec_ctx(self, *args, **kwargs) -> Iterator[RunningCommand]:
+    def create(self, cmd_path: str | Path) -> Command:
+        inherit_env_vars = (
+            "CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE",
+            "CLOUDSDK_CORE_PROJECT",
+            "CLOUDSDK_PROJECT",
+            "GCLOUD_PROJECT",
+            "GCP_PROJECT",
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "GOOGLE_CLOUD_PROJECT",
+            "GOOGLE_GHA_CREDS_PATH",
+            "HOME",
+            "PATH",
+        )
+
         # Predicate for allowed env vars
         def is_allowed_env_var(env_var: str) -> bool:
             return (
-                env_var.startswith("TF_")
+                env_var in inherit_env_vars
+                # Inherit terraform env vars
+                or env_var.startswith("TF_")
+                # Inherit terranova env vars
                 or env_var.startswith("TERRANOVA_")
                 # Implicit credentials for s3 backend
                 or env_var.startswith("AWS_")
-                # Forward gcp env vars
-                or env_var
-                in [
-                    "CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE",
-                    "CLOUDSDK_CORE_PROJECT",
-                    "CLOUDSDK_PROJECT",
-                    "GCLOUD_PROJECT",
-                    "GCP_PROJECT",
-                    "GOOGLE_APPLICATION_CREDENTIALS",
-                    "GOOGLE_CLOUD_PROJECT",
-                    "GOOGLE_GHA_CREDS_PATH",
-                ]
                 # Forward asdf for shims support
                 or env_var.startswith("ASDF_")
-                or env_var in ["HOME", "PATH"]
             )
 
-        # Copy allowed env vars
-        env = {
-            key: value for key, value in os.environ.items() if is_allowed_env_var(key)
-        }
+        env = EnvCmd.inherit(lambda k, _: is_allowed_env_var(k))
 
         # Bind variables
+        additional_env_vars = {}
         if self.__variables:
             for key, value in self.__variables.items():
-                env[f"TF_VAR_{key}"] = value
+                additional_env_vars[f"TF_VAR_{key}"] = value
 
         # Bind plugin cache dir
-        env["TF_PLUGIN_CACHE_DIR"] = (
+        additional_env_vars["TF_PLUGIN_CACHE_DIR"] = (
             SharedContext.terraform_shared_plugin_cache_dir().absolute().as_posix()
         )
 
         # Enable debug
         if SharedContext.is_verbose_enabled():
-            env["TF_LOG"] = "DEBUG"
+            additional_env_vars["TF_LOG"] = "DEBUG"
 
-        # Set all
-        kwargs["_env"] = env
-        if kwargs.get("_inherit"):
-            del kwargs["_inherit"]
-            kwargs["_in"] = sys.stdin
-            kwargs["_out"] = sys.stdout
-            kwargs["_err"] = sys.stderr
-        kwargs["_cwd"] = self.__work_dir
-        return super()._exec_ctx(*args, **kwargs)
+        return (
+            Command(cmd_path)
+            .env(env.add(additional_env_vars).build())
+            .cwd(self.__work_dir)
+        )
 
     def init(
         self,
@@ -183,7 +118,7 @@ class Terraform(Bind):
         if backend_config:
             for key, value in backend_config.items():
                 args.append(f"-backend-config={key}={value}")
-        self._exec(*args, _inherit=True)
+        self._cmd.args(*args).inherit().exec()
 
     def validate(self) -> None:
         """
@@ -193,7 +128,7 @@ class Terraform(Bind):
             InvalidResourcesError: if the resources configuration is invalid.
         """
         try:
-            self._exec("validate", _inherit=True)
+            self._cmd.args("validate").inherit().exec()
         except ErrorReturnCode as err:
             raise InvalidResourcesError(
                 cause="the syntax is probably incorrect.",
@@ -202,7 +137,7 @@ class Terraform(Bind):
 
     def fmt(self) -> None:
         """Reformat your configuration in the standard style."""
-        self._exec("fmt", _inherit=True)
+        self._cmd.args("fmt").inherit().exec()
 
     def plan(
         self,
@@ -226,7 +161,7 @@ class Terraform(Bind):
             args.append("-detailed-exitcode")
         if out:
             args.append(f"-out={out.as_posix()}")
-        self._exec(*args, _inherit=True)
+        self._cmd.args(*args).inherit().exec()
 
     def apply(
         self,
@@ -242,29 +177,30 @@ class Terraform(Bind):
             args.append("-auto-approve")
         if target:
             args.append(f"-target={target}")
-        self._exec(*args, _inherit=True)
+        self._cmd.args(*args).inherit().exec()
 
     def graph(self) -> None:
         """Generate a Graphviz graph of the steps in an operation."""
-        self._exec("graph", _inherit=True)
+        self._cmd.args("graph").inherit().exec()
 
     def taint(self, address: str) -> None:
         """Mark a resource as not fully functional."""
-        self._exec("taint", address, _inherit=True)
+        self._cmd.args("taint", address).inherit().exec()
 
     def untaint(self, address: str) -> None:
         """Remove the 'tainted' state from a resource instance."""
-        self._exec("untaint", address, _inherit=True)
+        self._cmd.args("untaint", address).inherit().exec()
 
     def output(self, name: str) -> str:
         """Show output values from your root module."""
-        result = self._exec("output", "-raw", name, _in=sys.stdin, _err=sys.stderr)
-        return result.stdout.decode(Constants.ENCODING_UTF_8)
+        capture = StringIO()
+        self._cmd.args("output", "-raw", name).inherit().stdout(capture).exec()
+        return capture.getvalue()
 
     def define(self, address: str, identifier: str) -> None:
         """Associate existing infrastructure with a Terraform resource."""
-        self._exec("import", address, identifier, _inherit=True)
+        self._cmd.args("import", address, identifier).inherit().exec()
 
     def destroy(self) -> None:
         """Destroy previously-created infrastructure."""
-        self._exec("destroy", _inherit=True)
+        self._cmd.args("destroy").inherit().exec()
