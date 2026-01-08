@@ -24,7 +24,6 @@ Steps to reproduce the behavior:
 
 ## 🖥️ Environment
 - OS: [e.g. macOS 26.x, Ubuntu 24.04]
-- Browser (if applicable): [e.g. Chrome 121]
 - Version / Commit: [e.g. v1.3.2 or commit hash]
 
 ## 📸 Screenshots / Logs
