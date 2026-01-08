@@ -1,19 +1,26 @@
 ---
-name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: ''
+name: ✨ Feature Request
+about: Suggest an idea or enhancement
+title: '[Feature]: '
+labels: 'type=addition,status=research'
 assignees: ''
 ---
 
-## :question: Is your feature request related to a problem? Please describe.
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+## 🚀 Feature Summary
+A short description of the feature you’d like to see.
 
-## :bulb: Describe the solution you'd like
-A clear and concise description of what you want to happen.
+## 🤔 Problem Statement
+What problem does this feature solve?
+Why is it important?
 
-## :thinking: Describe alternatives you've considered
-A clear and concise description of any alternative solutions or features you've considered.
+## 💡 Proposed Solution
+Describe how you envision this feature working.
 
-## :speech_balloon: Additional context
-Add any other context or screenshots about the feature request here.
+## 🔄 Alternatives Considered
+Describe any alternative solutions or features you’ve considered.
+
+## 📈 Impact
+Who benefits from this feature and how?
+
+## 📝 Additional Context
+Mockups, examples, or related issues.

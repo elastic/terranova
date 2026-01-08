@@ -1,30 +1,34 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
+name: 🐛 Bug Report
+about: Report something that is not working as expected
+title: '[Bug]: '
+labels: 'type=defect,status=research'
 assignees: ''
 ---
 
-## :bug: Describe the bug
+## :bug: Bug Description
 A clear and concise description of what the bug is.
 
-## :footprints: To Reproduce
+## ✅ Expected Behavior
+What you expected to happen.
+
+## ❌ Actual Behavior
+What actually happened.
+
+## 🔁 Steps to Reproduce
 Steps to reproduce the behavior:
 1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
+2. Click on '...'
+3. Run command '...'
 4. See error
 
-## :crystal_ball: Expected behavior
-A clear and concise description of what you expected to happen.
+## 🖥️ Environment
+- OS: [e.g. macOS 26.x, Ubuntu 24.04]
+- Browser (if applicable): [e.g. Chrome 121]
+- Version / Commit: [e.g. v1.3.2 or commit hash]
 
-## :camera: Screenshots
-If applicable, add screenshots to help explain your problem.
+## 📸 Screenshots / Logs
+If applicable, add screenshots, logs, or error messages.
 
-## :desktop_computer: Desktop (please complete the following information):
- - OS: [e.g. iOS]
- - Version [e.g. 22]
-
-## :speech_balloon: Additional context
-Add any other context about the problem here.
+## 🧠 Additional Context
+Any other context about the problem (workarounds, frequency, etc.).
