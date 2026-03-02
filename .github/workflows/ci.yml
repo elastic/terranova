@@ -64,7 +64,7 @@ jobs:
         uses: ./.github/workflows/env-install
 
       - name: Install terraform binary
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
           terraform_wrapper: false
 
