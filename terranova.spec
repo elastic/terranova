@@ -12,7 +12,7 @@ a = Analysis(
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
-    optimize=2,
+    optimize=1,
 )
 pyz = PYZ(a.pure)
 
@@ -21,7 +21,7 @@ exe = EXE(
     a.scripts,
     a.binaries,
     a.datas,
-    [('O', None, 'OPTION'), ('O', None, 'OPTION')],
+    [('O', None, 'OPTION')],
     name='terranova',
     debug=False,
     bootloader_ignore_signals=False,

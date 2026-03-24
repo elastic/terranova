@@ -20,7 +20,6 @@ import json
 import os
 import pkgutil
 import re
-import sys
 from collections import ChainMap, defaultdict
 from dataclasses import dataclass
 from enum import StrEnum
@@ -31,7 +30,6 @@ import yaml
 from jsonschema.exceptions import ValidationError
 from jsonschema.validators import validate
 from serde import field, from_dict
-from sh import Command
 
 from .exceptions import (
     InvalidManifestError,
@@ -41,6 +39,7 @@ from .exceptions import (
     UnreadableManifestError,
     VersionManifestError,
 )
+from .process import Command
 from .utils import Constants, SharedContext, serde
 
 
@@ -116,15 +115,10 @@ class ResourcesRunbook:
                     env[entry.name] = maybe_env_var
         if self.workdir:
             workdir = workdir.joinpath(self.workdir)
-        entrypoint = Command(self.entrypoint)
-        entrypoint(
-            self.args,
-            _env=env,
-            _cwd=workdir,
-            _in=sys.stdin,
-            _out=sys.stdout,
-            _err=sys.stderr,
-        )
+        entrypoint = Command(self.entrypoint).env(env).cwd(workdir).inherit()
+        if self.args:
+            entrypoint.args(*self.args)
+        entrypoint.exec()
 
 
 @serde

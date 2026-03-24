@@ -16,29 +16,17 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-import sys
+from contextlib import suppress
+from typing import IO, Any
 
-from scripts.utils import detect_pyinstaller
 
+def close(files: list[IO[Any]]) -> None:
+    """
+    Close a list of file handles, ignoring any errors.
 
-def run() -> None:
-    args = ["-n", "terranova", "--onefile", "--noconfirm", "--optimize=1"]
-    exclude_modules = ()
-    for exclude_module in exclude_modules:
-        args.extend(["--exclude-module", exclude_module])
-
-    hidden_imports = ()
-    for hidden_import in hidden_imports:
-        args.extend(["--hidden-import", hidden_import])
-
-    args.extend(
-        [
-            "--add-data",
-            "terranova/schemas/:terranova/schemas/",
-            "--add-data",
-            "terranova/templates/:terranova/templates/",
-            "./bin/terranova",
-        ]
-    )
-    pyinstaller = detect_pyinstaller()
-    pyinstaller.args(*args).inherit_out().exec()
+    Args:
+        files: list of file handles to close.
+    """
+    for file in files:
+        with suppress(OSError):
+            file.close()

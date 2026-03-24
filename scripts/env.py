@@ -25,6 +25,6 @@ def configure() -> None:
     # Skip pre-commit if not present
     pre_commit = detect_pre_commit()
     if pre_commit:
-        pre_commit("install", _out=sys.stdout, _err=sys.stderr)
+        pre_commit.args("install").inherit_out().exec()
     else:
         print("pre-commit isn't installed")

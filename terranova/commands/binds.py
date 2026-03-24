@@ -28,7 +28,6 @@ import mdformat
 from click.exceptions import Exit
 from jinja2 import Environment, PackageLoader
 from rich.table import Table
-from sh import ErrorReturnCode
 
 from terranova.commands.helpers import (
     Selector,
@@ -46,6 +45,7 @@ from terranova.exceptions import (
     MissingRunbookEnvError,
     MissingRunbookError,
 )
+from terranova.process import ErrorReturnCode
 from terranova.utils import Constants, Log, SharedContext
 
 
