@@ -19,7 +19,7 @@ dependencies = [
   "jsonschema>=4.23.0", # MIT
   "mdformat>=0.7.22", # MIT
   "pyserde>=0.25.1", # MIT
-  "rich>=14.0.0", # MIT
+  "rich>=15.0.0", # MIT
 ]
 
 [project.urls]
@@ -31,7 +31,7 @@ Tracker = "https://github.com/elastic/terranova/issues"
 terranova = "terranova.cli:main"
 
 [build-system]
-requires = ["uv_build>=0.10.0,<0.12.0"]
+requires = ["uv_build>=0.11.6,<0.12.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
@@ -45,11 +45,11 @@ build = [
 dev = [
   "basedpyright>=1.38.3", # MIT
   "licenseheaders>=0.8.8", # MIT
-  "poethepoet>=0.33.1", # MIT
+  "poethepoet>=0.44.0", # MIT
   "pytest-timeout>=2.3.1", # MIT
   "pytest-xdist>=3.6.1", # MIT
-  "pytest>=8.3.5", # MIT
-  "ruff>=0.11.5", # MIT
+  "pytest>=9.0.3", # MIT
+  "ruff>=0.15.10", # MIT
 ]
 
 [tool.uv]
