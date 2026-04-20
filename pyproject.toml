@@ -31,7 +31,7 @@ Tracker = "https://github.com/elastic/terranova/issues"
 terranova = "terranova.cli:main"
 
 [build-system]
-requires = ["uv_build>=0.11.6,<0.12.0"]
+requires = ["uv_build>=0.11.7,<0.12.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
@@ -43,13 +43,13 @@ build = [
   "pyinstaller>=6.13.0", # GPL-2.0: https://pyinstaller.org/en/stable/license.html
 ]
 dev = [
-  "basedpyright>=1.38.3", # MIT
+  "basedpyright>=1.39.2", # MIT
   "licenseheaders>=0.8.8", # MIT
   "poethepoet>=0.44.0", # MIT
   "pytest-timeout>=2.3.1", # MIT
   "pytest-xdist>=3.6.1", # MIT
   "pytest>=9.0.3", # MIT
-  "ruff>=0.15.10", # MIT
+  "ruff>=0.15.11", # MIT
 ]
 
 [tool.uv]
