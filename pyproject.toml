@@ -13,7 +13,7 @@ classifiers = [
 ]
 requires-python = ">=3.12,<3.14"
 dependencies = [
-  "click>=8.4.1", # BSD
+  "click>=8.4.2", # BSD
   "envyaml>=1.10.211231", # MIT
   "jinja2>=3.1.6", # BSD
   "jsonschema>=4.23.0", # MIT
@@ -31,7 +31,7 @@ Tracker = "https://github.com/elastic/terranova/issues"
 terranova = "terranova.cli:main"
 
 [build-system]
-requires = ["uv_build>=0.11.23,<0.12.0"]
+requires = ["uv_build>=0.11.25,<0.12.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
@@ -43,13 +43,13 @@ build = [
   "pyinstaller>=6.21.0", # GPL-2.0: https://pyinstaller.org/en/stable/license.html
 ]
 dev = [
-  "basedpyright>=1.39.8", # MIT
+  "basedpyright>=1.39.9", # MIT
   "licenseheaders>=0.8.8", # MIT
-  "poethepoet>=0.46.0", # MIT
+  "poethepoet>=0.47.0", # MIT
   "pytest-timeout>=2.3.1", # MIT
   "pytest-xdist>=3.6.1", # MIT
   "pytest>=9.1.1", # MIT
-  "ruff>=0.15.18", # MIT
+  "ruff>=0.15.20", # MIT
 ]
 
 [tool.uv]
