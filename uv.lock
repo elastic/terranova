@@ -315,15 +315,15 @@ wheels = [
 
 [[package]]
 name = "poethepoet"
-version = "0.47.0"
+version = "0.48.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pastel" },
     { name = "pyyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/8f/ec/0e80a71d3ea9fbbd0f419cd0f33c46bab0a19bbf65dacce96edf72dd09cd/poethepoet-0.47.0.tar.gz", hash = "sha256:8902da95e78ecec6bf1ee37b7c4da3bcf53f2ff89eb0d8a4447c01de4c4f2e6e", size = 145693, upload-time = "2026-06-27T14:00:46.849Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5c/92/93a4af9511b8c7c647874521d9e6c904266be98067c2ee1eb2e74520d208/poethepoet-0.48.0.tar.gz", hash = "sha256:a06f49d244fadfc2e2e7faa78b54e64a9694727e4ce1d50e08f23cea3ded74f1", size = 148679, upload-time = "2026-07-05T21:48:30.106Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/88/d3/419673fea140c243a8ed35022b92b355787dd565d2318dfab940b2a96b91/poethepoet-0.47.0-py3-none-any.whl", hash = "sha256:b443f38c5c8cd6e2415bcd5922a45c03ab120360ff0d515233ef6279f3f285c3", size = 183561, upload-time = "2026-06-27T14:00:45.031Z" },
+    { url = "https://files.pythonhosted.org/packages/59/8d/d7c9455b15f8d2d7ce57e7b71a8ef8d02d9992ae4283c9777120620c9022/poethepoet-0.48.0-py3-none-any.whl", hash = "sha256:98da6096d060f49b8d84034770265863fb7dc92a40233b7694b9d216ac68737d", size = 185808, upload-time = "2026-07-05T21:48:28.601Z" },
 ]
 
 [[package]]
@@ -377,7 +377,7 @@ wheels = [
 
 [[package]]
 name = "pyserde"
-version = "0.31.5"
+version = "0.31.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beartype" },
@@ -387,9 +387,9 @@ dependencies = [
     { name = "typing-extensions" },
     { name = "typing-inspect" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/38/49/143c9c6e5f714347306c5e911700fbe2ae8250ca5f154fc6d5d41fe68ace/pyserde-0.31.5.tar.gz", hash = "sha256:6f22803a859588e1f5c81e5dfff2e0e8e13b75c41a5864a8abea9a71c37341b6", size = 522685, upload-time = "2026-06-15T14:16:03.494Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/84/0b/4f92e27cb1ff15a820edc7b06b51bba4ef0d95bbf09522a72730cc7ffd51/pyserde-0.31.7.tar.gz", hash = "sha256:a9ec2a5a61930b6fee4498adda20067eab516798e5a0348da7797778d8b02fb6", size = 525805, upload-time = "2026-07-05T12:30:23.961Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/19/65/a4b92d9f786e2854b5aa71c606433014c5b894f21383ad84a32e6e7bd7ce/pyserde-0.31.5-py3-none-any.whl", hash = "sha256:0631592e3a6e63c8b20a00970b51abfc99b9a2c262a03320d86a46c98d2a3d3a", size = 51430, upload-time = "2026-06-15T14:16:01.992Z" },
+    { url = "https://files.pythonhosted.org/packages/27/9c/055c3fb933119186541240e062973b44932fc10295965edac08c57bc5946/pyserde-0.31.7-py3-none-any.whl", hash = "sha256:5e72d5c2054d681b4aad712a40322fa2236ca5c181377daed4dbb4ec51a22ebb", size = 52340, upload-time = "2026-07-05T12:30:22.687Z" },
 ]
 
 [[package]]
@@ -668,7 +668,7 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "jsonschema", specifier = ">=4.23.0" },
     { name = "mdformat", specifier = ">=0.7.22" },
-    { name = "pyserde", specifier = ">=0.31.5" },
+    { name = "pyserde", specifier = ">=0.31.7" },
     { name = "rich", specifier = ">=15.0.0" },
 ]
 
@@ -677,7 +677,7 @@ build = [{ name = "pyinstaller", specifier = ">=6.21.0" }]
 dev = [
     { name = "basedpyright", specifier = ">=1.39.9" },
     { name = "licenseheaders", specifier = ">=0.8.8" },
-    { name = "poethepoet", specifier = ">=0.47.0" },
+    { name = "poethepoet", specifier = ">=0.48.0" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-timeout", specifier = ">=2.3.1" },
     { name = "pytest-xdist", specifier = ">=3.6.1" },
