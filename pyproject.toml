@@ -31,7 +31,7 @@ Tracker = "https://github.com/elastic/terranova/issues"
 terranova = "terranova.cli:main"
 
 [build-system]
-requires = ["uv_build>=0.11.28,<0.12.0"]
+requires = ["uv_build>=0.11.29,<0.12.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
@@ -49,7 +49,7 @@ dev = [
   "pytest-timeout>=2.3.1", # MIT
   "pytest-xdist>=3.6.1", # MIT
   "pytest>=9.1.1", # MIT
-  "ruff>=0.15.21", # MIT
+  "ruff>=0.15.22", # MIT
 ]
 
 [tool.uv]
