@@ -132,10 +132,8 @@ def init(
         for dirname in ["outputs", "templates", "runbooks"]:
             dir_path = full_path / dirname
             try:
-                if dir_path.exists() and dir_path.is_dir():
-                    # Is it empty
-                    if not any(dir_path.iterdir()):
-                        dir_path.rmdir()
+                if dir_path.exists() and dir_path.is_dir() and not any(dir_path.iterdir()):
+                    dir_path.rmdir()
             except OSError:
                 Log.fatal(f"delete the directory at: {dir_path.as_posix()}")
 
@@ -392,7 +390,7 @@ def plan(
                             execution_plan[rel_path] = b64encode(
                                 path.read_bytes()
                             ).decode(Constants.ENCODING_UTF_8)
-                        raise plan_err
+                        raise
             else:
                 terraform.plan(**args)
         except ErrorReturnCode as err:
@@ -450,7 +448,7 @@ def apply(
             Path(path_or_plan).read_text(Constants.ENCODING_UTF_8)
         )
         paths = []
-        for rel_path in execution_plan.keys():
+        for rel_path in execution_plan:
             paths.append((SharedContext.resources_dir().joinpath(rel_path), rel_path))
     else:
         execution_plan = None

@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import override
 
 from terranova.exceptions import InvalidResourcesError
-from terranova.process import Bind, EnvCmd, CommandNotFound, Command, ErrorReturnCode
+from terranova.process import Bind, Command, CommandNotFound, EnvCmd, ErrorReturnCode
 from terranova.utils import Log, SharedContext
 
 
@@ -62,16 +62,8 @@ class Terraform(Bind):
 
         # Predicate for allowed env vars
         def is_allowed_env_var(env_var: str) -> bool:
-            return (
-                env_var in inherit_env_vars
-                # Inherit terraform env vars
-                or env_var.startswith("TF_")
-                # Inherit terranova env vars
-                or env_var.startswith("TERRANOVA_")
-                # Implicit credentials for s3 backend
-                or env_var.startswith("AWS_")
-                # Forward asdf for shims support
-                or env_var.startswith("ASDF_")
+            return env_var in inherit_env_vars or env_var.startswith(
+                ("TF_", "TERRANOVA_", "AWS_", "ASDF_")
             )
 
         env = EnvCmd.inherit(lambda k, _: is_allowed_env_var(k))
