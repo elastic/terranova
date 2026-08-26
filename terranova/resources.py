@@ -223,9 +223,7 @@ class Selector:
         attr_value = resource.attrs.get(self.name)
         if self.value and attr_value and self.value not in attr_value:
             return False
-        if not attr_value:
-            return False
-        return True
+        return bool(attr_value)
 
 
 class ResourcesFinder:

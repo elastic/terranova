@@ -19,7 +19,7 @@
 from functools import partial
 from pathlib import Path
 from threading import Lock
-from typing import Any, Final, NoReturn
+from typing import Any, ClassVar, Final, NoReturn
 
 from click.exceptions import Exit
 from rich.console import Console
@@ -49,7 +49,7 @@ class SharedContext:
     """Utility class to share context globally."""
 
     # Shard context
-    __UNDERLYING: dict[str, Any] = {}
+    __UNDERLYING: ClassVar[dict[str, Any]] = {}
     __LOCK: Lock = Lock()
 
     @staticmethod
@@ -124,12 +124,12 @@ class Log:
     @classmethod
     def action(cls, msg) -> None:
         """Log an action."""
-        SharedContext.console().print(f"[yellow]⇒[/yellow] {str(msg)}")
+        SharedContext.console().print(f"[yellow]⇒[/yellow] {msg!s}")
 
     @classmethod
     def success(cls, msg) -> None:
         """Log a success."""
-        SharedContext.console().print(f"[green]✓[/green] Succeeded to {str(msg)}")
+        SharedContext.console().print(f"[green]✓[/green] Succeeded to {msg!s}")
 
     @classmethod
     def failure(cls, msgs: str | list[str], err: Exception | None = None) -> None:
@@ -140,9 +140,9 @@ class Log:
             err_console.print(err)
         if not isinstance(msgs, list):
             msgs = [msgs]
-        err_console.print(f"[red]x[/red] Failed to {str(msgs[0])}")
+        err_console.print(f"[red]x[/red] Failed to {msgs[0]!s}")
         for msg in msgs[1:]:
-            err_console.print(f"  {str(msg)}")
+            err_console.print(f"  {msg!s}")
 
         # Render explained error
         if err:
