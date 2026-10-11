@@ -17,6 +17,9 @@
   <br>
 </h4>
 
+> [!IMPORTANT]
+> Elastic is no longer maintaining this project, see https://github.com/techcode-io/terranova for an actively-maintained fork.
+
 - [Source](https://github.com/elastic/terranova)
 - [Documentation](https://github.com/elastic/terranova)
 - [Issues](https://github.com/elastic/terranova/issues)
